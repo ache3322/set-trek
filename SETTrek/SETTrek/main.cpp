@@ -20,12 +20,16 @@
 */
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// WM_DESTROY is when the Window closes
+	// WM_DESTROY message - destroying the Window
 	if (uMsg == WM_DESTROY)
 	{
-		MessageBox(hwnd, "The application has closed", "test", MB_OK);
 		PostQuitMessage(0);
 		return 0;
+	}
+	// WM_CLOSE message - when Window closes
+	if (uMsg == WM_CLOSE)
+	{
+		MessageBox(hwnd, "The application is closing", "Closing Game", MB_OK);
 	}
 	// WM_PAINT is the paint event
 	if (uMsg == WM_PAINT)
@@ -64,32 +68,45 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 	windowclass.lpszClassName = "MainWindow";
 	// style = CS_HREDRAW | CS_VREDRAW allows for the redrawing of horizontal and vertical window
 	// Allows for redrawing when vertially and horizontally
-	windowclass.style = CS_HREDRAW | CS_VREDRAW; //Alert - This is useful here... what does it do?
-												 // We have to register the window
+	windowclass.style = CS_HREDRAW | CS_VREDRAW;
 	RegisterClassEx(&windowclass);
-
 
 	// The rectangle specifys a width x height which will be  the size of the window
 	RECT rect = { 0, 0, 1024, 768 };
 	AdjustWindowRectEx(&rect, WS_OVERLAPPED, false, WS_EX_OVERLAPPEDWINDOW);
 
-	//Below is another important process to understand... what are we doing?
 	// We need to use rect because without using rect, the window will clip off a bit of dps to adjust for margins...
 	HWND windowhandle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, "MainWindow", "SET Trek", WS_OVERLAPPEDWINDOW, 100, 100,
 		rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, 0);
 	if (!windowhandle) return -1;
 
 
+	// TODO: Initialization of the game here?
+
+
 	// Now show/display the window
 	ShowWindow(windowhandle, nCmdShow);
 
-	//Below, we have essentially an infinite loop that will keep the window running and will dispatch/show messages
-	MSG message;
-	while (GetMessage(&message, NULL, 0, 0))
-	{
-		DispatchMessage(&message);
-	}
 
+	//
+	// THE GAME LOOP?
+	// TEMP: Here is our "Game-loop" that will do all the work
+	// for processing input, updating, and rendering.
+	//
+	MSG message;
+	while (true)
+	{
+		while (GetMessage(&message, NULL, 0, 0))
+		{
+			DispatchMessage(&message);
+		}
+		
+		if (message.message == WM_QUIT)
+		{
+			// Break-out of the loop...
+			break;
+		}
+	}	
 
 	return 0;
 }

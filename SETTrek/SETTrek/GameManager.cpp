@@ -15,6 +15,30 @@
 * \param
 * \return
 */
+GameManager::GameManager()
+{
+
+}
+
+
+/**
+* \brief
+* \details
+* \param
+* \return
+*/
+GameManager::~GameManager()
+{
+
+}
+
+
+/**
+* \brief
+* \details
+* \param
+* \return
+*/
 bool GameManager::InitGame(void)
 {
 	return true;

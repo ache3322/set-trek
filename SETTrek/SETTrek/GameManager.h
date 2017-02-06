@@ -23,5 +23,8 @@ private:
 
 public:
 
+	GameManager();
+	~GameManager();
+
 	bool InitGame(void);
 };

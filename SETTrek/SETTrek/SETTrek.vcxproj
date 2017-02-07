@@ -142,15 +142,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Assets\Planet1.bmp" />
-    <Image Include="Assets\Planet2.bmp" />
-    <Image Include="Assets\Planet3.bmp" />
-    <Image Include="Assets\SectorBackground.bmp" />
-    <Image Include="Assets\ShipBase.bmp" />
-    <Image Include="Assets\ShipDetail.bmp" />
+    <ClInclude Include="GameManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

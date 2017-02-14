@@ -31,5 +31,7 @@ public:
 	~SpriteSheet();
 
 	/*-Other Methods-*/
-	void DrawToTarget(void);
+	void Draw(float left, float top);
+	void Draw(float left, float top, float right, float bottom);
+	void DrawToTarget(float x1, float y1, float x2, float y2);
 };

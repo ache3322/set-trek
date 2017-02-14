@@ -8,6 +8,8 @@
 #include <Windows.h>
 #include "Graphics.h"
 #include "GameManager.h"
+#include "Level.h"
+#include "Level1.h"
 
 
 //-GLOBAL VARIABLES
@@ -95,8 +97,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 		return -1;
 	}
 
-	// Initialize other game resources, assets, elements, levels, etc.
+	// Initialize the GameLevel (ensures Graphics object is known for all Levels)
+	Level::Init(graphics);
+	// Initialize the GameManager
 	GameManager::Init();
+	// Load the initial level
+	GameManager::LoadLevel(new Level1());
 
 	// Now show/display the window
 	ShowWindow(windowHandle, nCmdShow);

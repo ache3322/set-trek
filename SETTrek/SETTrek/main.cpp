@@ -37,7 +37,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	// WM_CLOSE message - when Window closes
 	if (uMsg == WM_CLOSE)
 	{
-		MessageBox(hwnd, "The application is closing", "Closing Game", MB_OK);
+		//MessageBox(hwnd, "The application is closing", "Closing Game", MB_OK);
 	}
 	// WM_PAINT is the paint event
 	if (uMsg == WM_PAINT)
@@ -88,6 +88,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 		rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, 0);
 	if (!windowHandle) return -1;
 
+	RECT windowSize;
+	GetClientRect(windowHandle, &windowSize); //set the rect's right and bottom properties = the client window's size
+	LONG nWidth = rect.right - rect.left;
+	LONG nHeight = rect.bottom - rect.top;
+
 	// Initialize the Graphics object
 	graphics = new Graphics();
 	if (!graphics->Init(windowHandle))
@@ -116,10 +121,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 	MSG message;
 	while (true)
 	{
-		while (GetMessage(&message, NULL, 0, 0))
+		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
 		{
 			DispatchMessage(&message);
 		}
+
 		if (message.message == WM_QUIT)
 		{
 			// Break-out of the loop...
@@ -127,10 +133,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 		}
 
 
+		GameManager::Update();
+
 		// TODO: Game logic down below...
+		graphics->BeginDraw();
+		// Render the Game
+		GameManager::Render();
 
-	}	
+		graphics->EndDraw();
+		Sleep(500);
+	}
 
+	GameManager::UnloadLevel();
 	delete graphics;
 	return 0;
 }

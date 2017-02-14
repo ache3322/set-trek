@@ -31,6 +31,8 @@ public:
 	static bool IsLoading;			//!< The current state of the game - is it loading?
 
 	static void LoadLevel(Level* level);
+	static void SwitchLevel(Level* newLevel);
+	static void UnloadLevel(void);
 
 	static void Init(void);
 	static void Render(void);

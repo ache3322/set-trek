@@ -43,6 +43,39 @@ void GameManager::LoadLevel(Level* level)
 * \brief
 * \details
 * \param
+*/
+void GameManager::SwitchLevel(Level* newLevel)
+{
+	IsLoading = true;
+
+	currentLevel->Unload();
+	currentLevel = newLevel;
+	currentLevel->Load();
+
+	IsLoading = false;
+}
+
+
+/**
+* \brief
+* \details
+* \param
+*/
+void GameManager::UnloadLevel(void)
+{
+	IsLoading = true;
+
+	// Unloading any resources (unloading a level)
+	currentLevel->Unload();
+
+	IsLoading = false;
+}
+
+
+/**
+* \brief
+* \details
+* \param
 * \return
 */
 void GameManager::Render(void)
@@ -51,6 +84,7 @@ void GameManager::Render(void)
 	if (IsLoading) {
 		return;
 	}
+	currentLevel->Render();
 }
 
 
@@ -66,4 +100,5 @@ void GameManager::Update(void)
 	if (IsLoading) {
 		return;
 	}
+	currentLevel->Update();
 }

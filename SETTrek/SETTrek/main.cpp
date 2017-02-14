@@ -6,6 +6,12 @@
 * DESCRIPTION	: The main entry point for the game.
 */
 #include <Windows.h>
+#include "Graphics.h"
+#include "GameManager.h"
+
+
+//-GLOBAL VARIABLES
+Graphics* graphics;
 
 
 
@@ -76,16 +82,24 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 	AdjustWindowRectEx(&rect, WS_OVERLAPPED, false, WS_EX_OVERLAPPEDWINDOW);
 
 	// We need to use rect because without using rect, the window will clip off a bit of dps to adjust for margins...
-	HWND windowhandle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, "MainWindow", "SET Trek", WS_OVERLAPPEDWINDOW, 100, 100,
+	HWND windowHandle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, "MainWindow", "SET Trek", WS_OVERLAPPEDWINDOW, 100, 100,
 		rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, 0);
-	if (!windowhandle) return -1;
+	if (!windowHandle) return -1;
 
+	// Initialize the Graphics object
+	graphics = new Graphics();
+	if (!graphics->Init(windowHandle))
+	{
+		delete graphics;
+		// An error occurred whilst initializing the graphics
+		return -1;
+	}
 
-	// TODO: Initialization of the game here?
-
+	// Initialize other game resources, assets, elements, levels, etc.
+	GameManager::Init();
 
 	// Now show/display the window
-	ShowWindow(windowhandle, nCmdShow);
+	ShowWindow(windowHandle, nCmdShow);
 
 
 	//
@@ -100,13 +114,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 		{
 			DispatchMessage(&message);
 		}
-		
 		if (message.message == WM_QUIT)
 		{
 			// Break-out of the loop...
 			break;
 		}
+
+
+		// TODO: Game logic down below...
+
 	}	
 
+	delete graphics;
 	return 0;
 }

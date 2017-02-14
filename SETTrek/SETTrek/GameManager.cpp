@@ -8,6 +8,7 @@
 #include "GameManager.h"
 
 
+Level* GameManager::currentLevel;	// Static variable instance of Level
 bool GameManager::IsLoading;		// Using the static boolean
 
 
@@ -18,6 +19,23 @@ bool GameManager::IsLoading;		// Using the static boolean
 void GameManager::Init(void)
 {
 	IsLoading = true;
+	currentLevel = NULL;
+}
+
+
+/**
+* \brief
+* \details
+* \param
+*/
+void GameManager::LoadLevel(Level* level)
+{
+	IsLoading = true;
+
+	currentLevel = level;
+	currentLevel->Load();
+
+	IsLoading = false;		// Finished loading the level
 }
 
 

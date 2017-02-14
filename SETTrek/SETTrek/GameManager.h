@@ -9,7 +9,7 @@
 *			outpus, updating and rendering.
 */
 #pragma once
-
+#include "Level.h"
 
 
 /**
@@ -23,12 +23,14 @@ class GameManager
 {
 private:
 
-	GameManager() {}			//!< A private constructor - allows for Singleton instance
-
+	GameManager() {}				//!< A private constructor - allows for Singleton instance
+	static Level* currentLevel;		//!< The current level that is loaded
 
 public:
 
-	static bool IsLoading;		//!< The current state of the game - is it loading?
+	static bool IsLoading;			//!< The current state of the game - is it loading?
+
+	static void LoadLevel(Level* level);
 
 	static void Init(void);
 	static void Render(void);

@@ -8,16 +8,16 @@
 #include "GameManager.h"
 
 
+bool GameManager::IsLoading;		// Using the static boolean
+
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Initializes the game.
+* \details Initialization of the current level.
 */
-GameManager::GameManager()
+void GameManager::Init(void)
 {
-
+	IsLoading = true;
 }
 
 
@@ -27,9 +27,12 @@ GameManager::GameManager()
 * \param
 * \return
 */
-GameManager::~GameManager()
+void GameManager::Render(void)
 {
-
+	// To prevent/avoid rendering while the game is loading
+	if (IsLoading) {
+		return;
+	}
 }
 
 
@@ -39,7 +42,10 @@ GameManager::~GameManager()
 * \param
 * \return
 */
-bool GameManager::InitGame(void)
+void GameManager::Update(void)
 {
-	return true;
+	// To prevent/avoid updating while the game is loading
+	if (IsLoading) {
+		return;
+	}
 }

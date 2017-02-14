@@ -11,20 +11,26 @@
 #pragma once
 
 
-/*
+
+/**
 * \class GameManager
-* \brief
+* \brief The GameManager (GameController) will initializes, renders, and updates the game.
+* \details The GameManager class is implemented as a Singleton. The purpose of this
+*	class is to run the game. The manager initializes all the resources required (the levels),
+*	renders shapes, and updates the game.
 */
 class GameManager
 {
 private:
 
+	GameManager() {}			//!< A private constructor - allows for Singleton instance
 
 
 public:
 
-	GameManager();
-	~GameManager();
+	static bool IsLoading;		//!< The current state of the game - is it loading?
 
-	bool InitGame(void);
+	static void Init(void);
+	static void Render(void);
+	static void Update(void);
 };

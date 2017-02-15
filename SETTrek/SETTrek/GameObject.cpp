@@ -71,11 +71,11 @@ void GameObject::Draw(float left, float top, float right, float bottom)
 	// The rectangle needs 4 points to be drawn!
 	D2D1_RECT_F destRect = D2D1::RectF(left, top, right, bottom);
 
-	gfx->GetRenderTarget()->DrawBitmap(
-		bitmap,
-		destRect,
-		1.0f,
-		D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
+	gfx->GetDeviceContext()->DrawBitmap(
+		bitmap, 
+		destRect, 
+		1.0f, 
+		D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, 
 		renderArea);
 }
 

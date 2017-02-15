@@ -88,10 +88,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 		rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, 0);
 	if (!windowHandle) return -1;
 
+	// Get the actual size of the game window
 	RECT windowSize;
-	GetClientRect(windowHandle, &windowSize); //set the rect's right and bottom properties = the client window's size
-	LONG nWidth = rect.right - rect.left;
-	LONG nHeight = rect.bottom - rect.top;
+	GetClientRect(windowHandle, &windowSize);
 
 	// Initialize the Graphics object
 	graphics = new Graphics();
@@ -107,16 +106,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 	// Initialize the GameManager
 	GameManager::Init();
 	// Load the initial level
-	GameManager::LoadLevel(new Level1());
+	GameManager::LoadLevel(new Level1(), D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
 
 	// Now show/display the window
 	ShowWindow(windowHandle, nCmdShow);
 
 
 	//
-	// THE GAME LOOP?
-	// TEMP: Here is our "Game-loop" that will do all the work
-	// for processing input, updating, and rendering.
+	// THE GAME LOOP
 	//
 	MSG message;
 	while (true)
@@ -132,15 +129,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 			break;
 		}
 
-
+		// Update the game - any values, assets, coordinates, sizes
 		GameManager::Update();
 
-		// TODO: Game logic down below...
+		// RENDERING!
 		graphics->BeginDraw();
 		// Render the Game
 		GameManager::Render();
-
 		graphics->EndDraw();
+
 		Sleep(500);
 	}
 

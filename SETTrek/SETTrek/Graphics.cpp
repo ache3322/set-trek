@@ -49,7 +49,7 @@ bool Graphics::Init(HWND windowHandle)
 	if (res != S_OK) return false;
 
 	RECT rect;
-	GetClientRect(windowHandle, &rect); //set the rect's right and bottom properties = the client window's size
+	GetClientRect(windowHandle, &rect); // Set the rect's right and bottom properties = the client window's size
 
 	// Create a render target to render window
 	// HwndRenderTargetProperties:

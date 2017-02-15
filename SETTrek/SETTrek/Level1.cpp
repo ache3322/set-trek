@@ -15,32 +15,35 @@
 * \param
 * \return
 */
-void Level1::Load(void)
+void Level1::Load(D2D1_RECT_F size)
 {
 	// Ensure the random number generator is operation
 	srand((unsigned int)time(NULL));
 
-	// TEMP
-	windowWidth = 1008.0f; // Original: 1024
-	windowHeight = 729.0f; // Original: 768
+	screenSize = size;
+	windowWidth = screenSize.right;		// Original: 1024
+	windowHeight = screenSize.bottom;	// Original: 768, 729, 772
 
 	gridWidth = windowWidth / kNumberOfGrid;
 	gridHeight = windowHeight / kNumberOfGrid;
 
-	shipX = 0.0f;
-
 	// Loading the assets, resources, images, etc.
-	pBackground = new SpriteSheet(L".\\assets\\SectorBackground.bmp", gfx);
-	pStarShip = new SpriteSheet(L".\\assets\\ShipBase.bmp", gfx);
-	pPlanet1 = new SpriteSheet(L".\\assets\\Planet1.bmp", gfx);
-	pPlanet2 = new SpriteSheet(L".\\assets\\Planet2.bmp", gfx);
-	pPlanet3 = new SpriteSheet(L".\\assets\\Planet3.bmp", gfx);
-	numberOfGeneratedPlanets = 0;
+	pBackground = new GameObject(gfx, screenSize);
+	pStarShip = new GameObject(gfx, screenSize);
+	pPlanet1 = new GameObject(gfx, screenSize);
+	pPlanet2 = new GameObject(gfx, screenSize);
+	pPlanet3 = new GameObject(gfx, screenSize);
 
+	pBackground->Init(L".\\assets\\SectorBackground.bmp");
+	pStarShip->Init(L".\\assets\\ShipBase.bmp");
+	pPlanet1->Init(L".\\assets\\Planet1.bmp");
+	pPlanet2->Init(L".\\assets\\Planet2.bmp");
+	pPlanet3->Init(L".\\assets\\Planet3.bmp");
 
 	// Generate the grid positions/coordinates
 	GenerateGrid();
-	GenerateRandomGrid();
+	// Generate the initial random coordinates and planets
+	GenerateRandomCoord();
 	GenerateRandomPlanet();
 }
 
@@ -63,24 +66,23 @@ void Level1::Unload(void)
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Update the game and objects.
+* \details Updates the game logic. The logic includes moving GameObjects
+*	and any level decisions.
 */
 void Level1::Update(void)
 {
-	shipX = shipX + gridWidth;
+	pStarShip->SetX1(pStarShip->GetX1() + gridWidth);
 
-	// The ship has left the screen
-	if (shipX > windowWidth)
+	// The Starship reached the end of "sector space" (edge of screen)
+	if (pStarShip->GetX1() > windowWidth)
 	{
 		// Reset the ship's position to the beginning
-		shipX = 0;
+		pStarShip->SetX1(0);
 
 		// Generate another random set of coordinates for the planets
-		chosenGrid.clear();
-		GenerateRandomGrid();
+		randCoord.clear();
+		GenerateRandomCoord();
 		chosenPlanets.clear();
 		GenerateRandomPlanet();
 	}
@@ -95,29 +97,22 @@ void Level1::Update(void)
 */
 void Level1::Render(void)
 {
+	// 1. Draw the Background before other objects
 	pBackground->Draw(0, 0, windowWidth, windowHeight);
-	pStarShip->Draw(shipX, spaceGrid[kMiddleGrid - 1].first, gridWidth + shipX, spaceGrid[kMiddleGrid - 1].first + gridHeight);
+	// 2. Draw the Starship
+	pStarShip->Draw(pStarShip->GetX1(), grid[kCenterGrid].second,
+		pStarShip->GetX1() + gridWidth, grid[kCenterGrid].second + gridHeight);
 
-
-	for (int i = 0; i < chosenGrid.size(); ++i)
+	// 3. Draw the random-chanced Planets
+	for (int i = 0; i < randCoord.size(); ++i)
 	{
 		chosenPlanets[i]->Draw(
-			chosenGrid[i].first,
-			chosenGrid[i].second,
-			chosenGrid[i].first + gridWidth,
-			chosenGrid[i].second + gridHeight
+			randCoord[i].first,
+			randCoord[i].second,
+			randCoord[i].first + gridWidth,
+			randCoord[i].second + gridHeight
 		);
 	}
-
-	//for (int i = 0; i < spaceGrid.size(); ++i)
-	//{
-	//	pStarShip->Draw(
-	//		spaceGrid[i].first,
-	//		spaceGrid[i].second,
-	//		spaceGrid[i].first + gridWidth,
-	//		spaceGrid[i].second + gridHeight
-	//		);
-	//}
 }
 
 
@@ -129,19 +124,21 @@ void Level1::Render(void)
 */
 void Level1::GenerateGrid(void)
 {
-	int row = 0;		// X-axis
-	int col = 0;		// Y-axis
+	int row = 0;
+	int col = 0;
 
-	for (col = 0; col < kNumberOfGrid; ++col)
+	for (row = 0; row < kNumberOfGrid; ++row)
 	{
-		for (int row = 0; row < kNumberOfGrid; ++row)
+		for (col = 0; col < kNumberOfGrid; ++col)
 		{
-			// <x, y>
-			pair<float, float> coord;
-			coord.first = row * gridWidth;
-			coord.second = col * gridHeight;
+			// The pair takes in pair coordinates: (x, y), (col, row)
+			pair<float, float> coordinate;
 
-			spaceGrid.push_back(coord);
+			// The col is along the X-axis
+			coordinate.first = col * gridWidth;
+			// The row is along the Y-axis
+			coordinate.second = row * gridHeight;
+			grid.push_back(coordinate);
 		}
 	}
 }
@@ -153,29 +150,27 @@ void Level1::GenerateGrid(void)
 * \param
 * \return
 */
-void Level1::GenerateRandomGrid(void)
+void Level1::GenerateRandomCoord(void)
 {
-	bool isSpawn = false;
-	int chance = 0;
+	bool doSpawn = false;
 	
-	// For each spaceGrid position, calculate the chance
+	// For each grid position, calculate the chance
 	// for a planet to spawn. There is a 1 in 20 (5%) chance
 	// that a planet will spawn...
-	for (int i = 0; i < spaceGrid.size(); ++i)
+	for (int i = 0; i < grid.size(); ++i)
 	{
-		isSpawn = (rand() % 100) < 5;
+		doSpawn = (rand() % 100) < 5;
 
-		if (isSpawn)
+		if (doSpawn)
 		{
 			// These are the chose grid positions where
 			// a planet is going to be drawn at
 			pair<float, float> coord;
-			coord.first = spaceGrid[i].first;
-			coord.second = spaceGrid[i].second;
-			chosenGrid.push_back(coord);
+			coord.first = grid[i].first;
+			coord.second = grid[i].second;
+			randCoord.push_back(coord);
 
-			++numberOfGeneratedPlanets;
-			isSpawn = false;
+			doSpawn = false;
 		}
 	}
 }
@@ -189,24 +184,21 @@ void Level1::GenerateRandomGrid(void)
 */
 void Level1::GenerateRandomPlanet(void)
 {
-	int chosenPlanet = 0;
+	int randomChance = 0;
 
 	// For each chosen grid coordinate - we choose
 	// what planets to spawn at that coordinate. It
 	// could be Earth, Mars, or Jupiter
-	for (size_t i = 0; i < chosenGrid.size(); ++i)
+	for (size_t i = 0; i < randCoord.size(); ++i)
 	{
-		chosenPlanet = rand() % 3;
-		if (chosenPlanet == 0)
-		{
+		randomChance = rand() % 3;
+		if (randomChance == 0) {
 			chosenPlanets.push_back(pPlanet1);
 		}
-		else if (chosenPlanet == 1)
-		{
+		else if (randomChance == 1) {
 			chosenPlanets.push_back(pPlanet2);
 		}
-		else if (chosenPlanet == 2)
-		{
+		else if (randomChance == 2) {
 			chosenPlanets.push_back(pPlanet3);
 		}
 	}

@@ -30,8 +30,4 @@ public:
 
 	/*-Destructor-*/
 	~SpriteSheet();
-
-	/*-Other Methods-*/
-	void Draw(float left, float top, float right, float bottom);
-	void Draw(float left, float top, float right, float bottom, D2D1_RECT_F windowSize);
 };

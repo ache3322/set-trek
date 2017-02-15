@@ -63,10 +63,11 @@ SpriteSheet::SpriteSheet(LPCWSTR filename, Graphics* gfx)
 	}
 	if (SUCCEEDED(hr)) {
 		// Create a Direct2D bitmap from the WIC bitmap.
-		gfx->GetRenderTarget()->CreateBitmapFromWicBitmap(
+		gfx->GetDeviceContext()->CreateBitmapFromWicBitmap(
 			pConverter,
 			NULL,
-			&bitmap);
+			&bitmap
+		);
 	}
 
 	// CLEAN UP RESOURCES
@@ -129,7 +130,7 @@ SpriteSheet::SpriteSheet(LPCWSTR filename, Graphics* gfx, ID2D1Bitmap** bmp)
 	}
 	if (SUCCEEDED(hr)) {
 		// Create a Direct2D bitmap from the WIC bitmap.
-		gfx->GetRenderTarget()->CreateBitmapFromWicBitmap(
+		gfx->GetDeviceContext()->CreateBitmapFromWicBitmap(
 			pConverter,
 			NULL,
 			bmp);
@@ -150,51 +151,4 @@ SpriteSheet::SpriteSheet(LPCWSTR filename, Graphics* gfx, ID2D1Bitmap** bmp)
 SpriteSheet::~SpriteSheet()
 {
 	if (bitmap) bitmap->Release();
-}
-
-
-/**
-* \brief
-*/
-void SpriteSheet::Draw(float left, float top, float right, float bottom)
-{
-	// Refers to the location of where the bitmap
-	// will be drawn, relative to the source rectangle
-	D2D1_RECT_F destRect = D2D1::RectF(
-		left, top,
-		right, bottom
-	);
-	// The source rectangle is the screen-size of
-	// where the bitmap will be displayed
-	D2D1_RECT_F srcRect = D2D1::RectF(
-		0, 0,
-		1008, 729
-	);
-
-	gfx->GetRenderTarget()->DrawBitmap(
-		bitmap,
-		destRect,
-		1.0F,
-		D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
-		srcRect
-	);
-}
-
-
-/**
-* \brief
-*/
-void SpriteSheet::Draw(float left, float top, float right, float bottom, D2D1_RECT_F windowSize)
-{
-	// Refers to the location of where the bitmap
-	// will be drawn, relative to the source rectangle
-	D2D1_RECT_F destRect = D2D1::RectF(left, top, right, bottom);
-	
-	gfx->GetRenderTarget()->DrawBitmap(
-		bitmap,
-		destRect,
-		1.0F,
-		D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
-		windowSize
-	);
 }

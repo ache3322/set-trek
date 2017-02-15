@@ -28,12 +28,12 @@ void GameManager::Init(void)
 * \details
 * \param
 */
-void GameManager::LoadLevel(Level* level)
+void GameManager::LoadLevel(Level* level, D2D1_RECT_F size)
 {
 	IsLoading = true;
 
 	currentLevel = level;
-	currentLevel->Load();
+	currentLevel->Load(size);
 
 	IsLoading = false;		// Finished loading the level
 }
@@ -44,13 +44,13 @@ void GameManager::LoadLevel(Level* level)
 * \details
 * \param
 */
-void GameManager::SwitchLevel(Level* newLevel)
+void GameManager::SwitchLevel(Level* newLevel, D2D1_RECT_F size)
 {
 	IsLoading = true;
 
 	currentLevel->Unload();
 	currentLevel = newLevel;
-	currentLevel->Load();
+	currentLevel->Load(size);
 
 	IsLoading = false;
 }

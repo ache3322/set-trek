@@ -97,22 +97,23 @@ void Level1::Update(void)
 */
 void Level1::Render(void)
 {
+
 	// 1. Draw the Background before other objects
 	pBackground->Draw(0, 0, windowWidth, windowHeight);
 	// 2. Draw the Starship
 	pStarShip->Draw(pStarShip->GetX1(), grid[kCenterGrid].second,
 		pStarShip->GetX1() + gridWidth, grid[kCenterGrid].second + gridHeight);
 
-	// 3. Draw the random-chanced Planets
-	for (int i = 0; i < randCoord.size(); ++i)
-	{
-		chosenPlanets[i]->Draw(
-			randCoord[i].first,
-			randCoord[i].second,
-			randCoord[i].first + gridWidth,
-			randCoord[i].second + gridHeight
-		);
-	}
+	//// 3. Draw the random-chanced Planets
+	//for (int i = 0; i < randCoord.size(); ++i)
+	//{
+	//	chosenPlanets[i]->Draw(
+	//		randCoord[i].first,
+	//		randCoord[i].second,
+	//		randCoord[i].first + gridWidth,
+	//		randCoord[i].second + gridHeight
+	//	);
+	//}
 }
 
 

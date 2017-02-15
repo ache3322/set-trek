@@ -30,6 +30,7 @@ private:
 
 	D2D1_RECT_F renderArea;	//!< The rectangle area/size of where the object will be drawn
 	ID2D1Bitmap* bitmap;	//!< Holds the loaded Bitmap file
+	ID2D1Effect* chroma;	//!<
 	Graphics* gfx;			//!< Reference to the Graphics object
 
 

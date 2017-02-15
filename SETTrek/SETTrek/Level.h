@@ -7,7 +7,6 @@
 */
 #pragma once
 #include "Graphics.h"
-#include "SpriteSheet.h"
 
 
 
@@ -24,8 +23,8 @@ public:
 
 	static void Init(Graphics * graphics);
 
-	virtual void Load(void) = 0;		// For loading assets for the game level
-	virtual void Unload(void) = 0;		// For unloading assets from the game level
-	virtual void Update(void) = 0;		// For updating the game level
-	virtual void Render(void) = 0;		// For rendering the game level
+	virtual void Load(D2D1_RECT_F size) = 0;	// For loading assets for the game level
+	virtual void Unload(void) = 0;				// For unloading assets from the game level
+	virtual void Update(void) = 0;				// For updating the game level
+	virtual void Render(void) = 0;				// For rendering the game level
 };

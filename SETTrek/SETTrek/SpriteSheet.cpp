@@ -17,8 +17,6 @@
 */
 SpriteSheet::SpriteSheet(LPCWSTR filename, Graphics* gfx)
 {
-	this->gfx = gfx;
-
 	IWICBitmapDecoder *pDecoder = NULL;
 	IWICBitmapFrameDecode *pSource = NULL;
 	IWICFormatConverter *pConverter = NULL;

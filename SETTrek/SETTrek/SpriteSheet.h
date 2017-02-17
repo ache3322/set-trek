@@ -19,7 +19,6 @@ class SpriteSheet
 {
 private:
 
-	Graphics* gfx;			//!< Reference to the Graphics class
 	ID2D1Bitmap* bitmap;	//!< Holds the loaded Bitmap file
 
 public:

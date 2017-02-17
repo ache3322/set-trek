@@ -33,12 +33,56 @@ void Level1::Load(D2D1_RECT_F size)
 	pPlanet1 = new GameObject(gfx, screenSize);
 	pPlanet2 = new GameObject(gfx, screenSize);
 	pPlanet3 = new GameObject(gfx, screenSize);
+	GameObject* starShipBase = new GameObject(gfx, screenSize);
+	GameObject* starShipDetail = new GameObject(gfx, screenSize);
 
 	pBackground->Init(L".\\assets\\SectorBackground.bmp");
 	pStarShip->Init(L".\\assets\\ShipBase.bmp");
 	pPlanet1->Init(L".\\assets\\Planet1.bmp");
 	pPlanet2->Init(L".\\assets\\Planet2.bmp");
 	pPlanet3->Init(L".\\assets\\Planet3.bmp");
+	starShipBase->Init(L".\\assets\\ShipBase.bmp");
+	starShipDetail->Init(L".\\assets\\ShipDetail.bmp");
+
+	//---------------------
+
+	ComPtr<ID2D1Effect> chromaKey;
+	// Do the Chroma Effect on each resource!
+	chromaKey = EffectManager::CreateChroma(gfx, pPlanet1->GetBitmap());
+	pPlanet1->SetBitmap(
+		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), pPlanet1->GetBitmapPixelSize())
+	);
+
+	chromaKey = EffectManager::CreateChroma(gfx, pPlanet2->GetBitmap());
+	pPlanet2->SetBitmap(
+		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), pPlanet2->GetBitmapPixelSize())
+	);
+
+	chromaKey = EffectManager::CreateChroma(gfx, pPlanet3->GetBitmap());
+	pPlanet3->SetBitmap(
+		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), pPlanet3->GetBitmapPixelSize())
+	);
+
+	chromaKey = EffectManager::CreateChroma(gfx, starShipBase->GetBitmap());
+	starShipBase->SetBitmap(
+		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), starShipBase->GetBitmapPixelSize())
+	);
+
+	chromaKey = EffectManager::CreateChroma(gfx, starShipDetail->GetBitmap());
+	starShipDetail->SetBitmap(
+		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), starShipDetail->GetBitmapPixelSize())
+	);
+
+	//---------------------
+
+	// Do the composite on the ship
+	ComPtr<ID2D1Effect> compositeKey;
+	compositeKey = EffectManager::CreateComposite(gfx, starShipBase->GetBitmap(), starShipDetail->GetBitmap());
+	pStarShip->SetBitmap(EffectManager::ConvertToBitmap(gfx, compositeKey.Get(), pStarShip->GetBitmapPixelSize()));
+
+	delete starShipBase;
+	delete starShipDetail;
+	//--------------------
 
 	// Generate the grid positions/coordinates
 	GenerateGrid();
@@ -100,20 +144,21 @@ void Level1::Render(void)
 
 	// 1. Draw the Background before other objects
 	pBackground->Draw(0, 0, windowWidth, windowHeight);
+
+	// 3. Draw the random-chanced Planets
+	for (int i = 0; i < randCoord.size(); ++i)
+	{
+		chosenPlanets[i]->Draw(
+			randCoord[i].first,
+			randCoord[i].second,
+			randCoord[i].first + gridWidth,
+			randCoord[i].second + gridHeight
+		);
+	}
+
 	// 2. Draw the Starship
 	pStarShip->Draw(pStarShip->GetX1(), grid[kCenterGrid].second,
 		pStarShip->GetX1() + gridWidth, grid[kCenterGrid].second + gridHeight);
-
-	//// 3. Draw the random-chanced Planets
-	//for (int i = 0; i < randCoord.size(); ++i)
-	//{
-	//	chosenPlanets[i]->Draw(
-	//		randCoord[i].first,
-	//		randCoord[i].second,
-	//		randCoord[i].first + gridWidth,
-	//		randCoord[i].second + gridHeight
-	//	);
-	//}
 }
 
 

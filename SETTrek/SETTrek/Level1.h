@@ -7,6 +7,7 @@
 */
 #pragma once
 #include "Level.h"
+#include "EffectManager.h"
 #include "GameObject.h"
 #include <time.h>
 #include <vector>

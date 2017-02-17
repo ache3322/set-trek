@@ -30,7 +30,6 @@ private:
 
 	D2D1_RECT_F renderArea;	//!< The rectangle area/size of where the object will be drawn
 	ID2D1Bitmap* bitmap;	//!< Holds the loaded Bitmap file
-	ID2D1Effect* chroma;	//!<
 	Graphics* gfx;			//!< Reference to the Graphics object
 
 
@@ -48,12 +47,15 @@ public:
 	void Draw(float left, float top, float right, float bottom);
 
 	//-Accessors
+	ID2D1Bitmap* GetBitmap(void);
+	D2D1_SIZE_U GetBitmapPixelSize(void);
 	float GetX1(void);
 	float GetY1(void);
 	float GetX2(void);
 	float GetY2(void);
 
 	//-Mutators
+	void SetBitmap(ID2D1Bitmap* bmp);
 	void SetX1(float x);
 	void SetY1(float y);
 	void SetX2(float x);

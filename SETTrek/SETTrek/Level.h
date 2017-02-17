@@ -3,7 +3,7 @@
 * FILE			: Level.h
 * PROGRAMMER	: Austin Che
 * DATE			: 2017/02/14
-* DESCRIPTION	:
+* DESCRIPTION	: The header file containing an abstract definition of the Level interface.
 */
 #pragma once
 #include "Graphics.h"

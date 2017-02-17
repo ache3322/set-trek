@@ -13,13 +13,12 @@
 
 /**
 * \class SpriteSheet
-* \brief
+* \brief The spritesheet loads bitmap resources from file.
 */
 class SpriteSheet
 {
 private:
 
-	ID2D1Bitmap* bitmap;	//!< Holds the loaded Bitmap file
 
 public:
 

@@ -116,6 +116,7 @@ void Level1::Unload(void)
 */
 void Level1::Update(void)
 {
+	// The start ship moves grid to grid
 	pStarShip->SetX1(pStarShip->GetX1() + gridWidth);
 
 	// The Starship reached the end of "sector space" (edge of screen)
@@ -141,8 +142,7 @@ void Level1::Update(void)
 */
 void Level1::Render(void)
 {
-
-	// 1. Draw the Background before other objects
+	//1. Draw the Background before other objects
 	pBackground->Draw(0, 0, windowWidth, windowHeight);
 
 	// 3. Draw the random-chanced Planets

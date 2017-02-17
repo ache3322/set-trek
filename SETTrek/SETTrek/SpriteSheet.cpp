@@ -10,10 +10,9 @@
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Loading a bitmap resource (from file) to memory.
+* \param filename - LPCWSTR - The file name / path to the asset
+* \param gfx - Graphics* - Creating render target area for drawing bitmap
 */
 SpriteSheet::SpriteSheet(LPCWSTR filename, Graphics* gfx)
 {
@@ -61,11 +60,11 @@ SpriteSheet::SpriteSheet(LPCWSTR filename, Graphics* gfx)
 	}
 	if (SUCCEEDED(hr)) {
 		// Create a Direct2D bitmap from the WIC bitmap.
-		gfx->GetDeviceContext()->CreateBitmapFromWicBitmap(
-			pConverter,
-			NULL,
-			&bitmap
-		);
+		//gfx->GetDeviceContext()->CreateBitmapFromWicBitmap(
+		//	pConverter,
+		//	NULL,
+		//	&bitmap
+		//);
 	}
 
 	// CLEAN UP RESOURCES
@@ -139,7 +138,6 @@ SpriteSheet::SpriteSheet(LPCWSTR filename, Graphics* gfx, ID2D1Bitmap** bmp)
 	if (pDecoder) pDecoder->Release();
 	if (pSource) pSource->Release();
 	if (pConverter) pConverter->Release();
-	bitmap = NULL;
 }
 
 
@@ -148,5 +146,4 @@ SpriteSheet::SpriteSheet(LPCWSTR filename, Graphics* gfx, ID2D1Bitmap** bmp)
 */
 SpriteSheet::~SpriteSheet()
 {
-	if (bitmap) bitmap->Release();
 }

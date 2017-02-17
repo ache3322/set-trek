@@ -24,9 +24,9 @@ void GameManager::Init(void)
 
 
 /**
-* \brief
-* \details
-* \param
+* \brief Loading an initial level.
+* \param level - Level* - The level being loaded
+* \param size - D2D1_RECT_F - The dimensions of the window screen (client screen)
 */
 void GameManager::LoadLevel(Level* level, D2D1_RECT_F size)
 {
@@ -40,9 +40,11 @@ void GameManager::LoadLevel(Level* level, D2D1_RECT_F size)
 
 
 /**
-* \brief
-* \details
-* \param
+* \brief Switching new levels.
+* \details When switching levels, the current level is unloaded, then
+*	the new level is loaded.
+* \param level - Level* - The level being loaded
+* \param size - D2D1_RECT_F - The dimensions of the window screen (client screen)
 */
 void GameManager::SwitchLevel(Level* newLevel, D2D1_RECT_F size)
 {
@@ -57,9 +59,7 @@ void GameManager::SwitchLevel(Level* newLevel, D2D1_RECT_F size)
 
 
 /**
-* \brief
-* \details
-* \param
+* \brief Unloading the current level.
 */
 void GameManager::UnloadLevel(void)
 {
@@ -73,10 +73,8 @@ void GameManager::UnloadLevel(void)
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Rendering the game objects inside the level.
+* \param void
 */
 void GameManager::Render(void)
 {
@@ -89,10 +87,8 @@ void GameManager::Render(void)
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Updating the game objects inside the level.
+* \param void
 */
 void GameManager::Update(void)
 {

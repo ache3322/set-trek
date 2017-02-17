@@ -33,9 +33,9 @@ Graphics::Graphics()
 }
 
 /**
-* \brief Destructor for Graphics class
-* \details Note that all COM objects must be 'released'. The COM objects are contained
-*		in the d2d1 header file.
+* \brief Destructor for Graphics class.
+* \details Note that all COM objects must be 'released'. The COM objects from
+*	the Direct2D library.
 */
 Graphics::~Graphics()
 {
@@ -55,7 +55,7 @@ Graphics::~Graphics()
 *		It includes binding the client's window to the COM.<br/>
 * Credit: https://katyscode.wordpress.com/2013/01/23/migrating-existing-direct2d-applications-to-use-direct2d-1-1-functionality-in-windows-7/
 * \param windowHandle - HWND - A handle to the client's 
-* \return bool : If Graphics is able to initialize.
+* \return bool : true if the Graphics was initialized, else return false.
 */
 bool Graphics::Init(HWND windowHandle)
 {
@@ -227,7 +227,74 @@ bool Graphics::Init(HWND windowHandle)
 
 
 /**
-* \brief End drawing the graphics
+* \brief
+* \details
+* \param
+* \return void
+*/
+void Graphics::Resize(HWND windowHandle)
+{
+	ComPtr<IDXGIDevice> dxgiDevice;
+
+	// Fetching the underlying DXGI device
+	d3d11Device->QueryInterface(__uuidof(IDXGIDevice), (void **)&dxgiDevice);
+
+	// Variables for Swap Chaining
+	ComPtr<IDXGIAdapter> dxgiAdapter;
+	ComPtr<IDXGIFactory2> dxgiFactory;
+
+	// 1. Getting the DXGI Factory object and adapter
+	dxgiDevice->GetAdapter(&dxgiAdapter);
+
+	// 2. Get an instance of the DXGI factory
+	dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory));
+
+	// 3. Defining and describing the swap chain
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = { 0 };
+	swapChainDesc.Width = 0;        // use automatic sizing
+	swapChainDesc.Height = 0;		// determined by client size
+	swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	swapChainDesc.Stereo = false;
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Quality = 0;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.BufferCount = 2;						 // Use double buffering to enable flip
+	swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD; // Disabling the swap effects
+	swapChainDesc.Flags = 0;
+
+	// 5. Get the backbuffer
+	ComPtr<IDXGISurface> dxgiBackBuffer;
+	dxgiSwapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer));
+
+
+	FLOAT dpiX = 0.f;
+	FLOAT dpiY = 0.f;
+	// 6. Creation of a bitmap needed to be the render target
+	d2d1Factory1->GetDesktopDpi(&dpiX, &dpiY);
+
+	D2D1_BITMAP_PROPERTIES1 bitmapProperties =
+		D2D1::BitmapProperties1(
+			D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+			D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE),
+			dpiX,
+			dpiY
+		);
+
+	d2d1Context->CreateBitmapFromDxgiSurface(
+		dxgiBackBuffer.Get(),
+		bitmapProperties,
+		&d2d1Bitmap);
+
+	// 7. Finally! Now set the new bitmap as the Device Context's render target
+	d2d1Context->SetTarget(d2d1Bitmap);
+}
+
+
+/**
+* \brief End drawing the graphics.
+* \details After ending the draw, the render target
+*	must be swapped chained.
 * \param void
 * \return void
 */
@@ -278,6 +345,7 @@ void Graphics::ClearScreen(float r, float g, float b)
 * \param r - float - The red channel
 * \param g - float - The green channel
 * \param b - float - The blue channel
+* \param a - float - The alpha channel
 */
 void Graphics::DrawCircle(float x, float y, float radius, float r, float g, float b, float a)
 {
@@ -289,6 +357,17 @@ void Graphics::DrawCircle(float x, float y, float radius, float r, float g, floa
 }
 
 
+/**
+* \brief Draws a rectangle.
+* \param left - float - The upper-left corner of the rectangle (x1)
+* \param top - float - The upper-top corner of the rectangle (y1)
+* \param right - float - The lower-right corner of the rectangle (x2)
+* \param bottom - float - The lower-bottom corner of the rectangle (y2)
+* \param r - float - The red channel
+* \param g - float - The green channel
+* \param b - float - The blue channel
+* \param a - float - The alpha channel
+*/
 void Graphics::DrawRectangle(float left, float top, float right, float bottom, float r, float g, float b, float a)
 {
 	brush->SetColor(D2D1::ColorF(r, g, b, a));

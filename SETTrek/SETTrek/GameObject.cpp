@@ -9,11 +9,16 @@
 
 
 
+//---------------------------------
+//=======================
+// CONSTRUCTORS
+//=======================
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Constructor for the game object.
+* \details Set the values to a default value.
+* \param graphics - Graphics* - A reference to the graphics object
+* \param area - D2D1_RECT_F - The dimensions of the screen
+* \return None
 */
 GameObject::GameObject(Graphics* graphics, D2D1_RECT_F area)
 {
@@ -30,11 +35,17 @@ GameObject::GameObject(Graphics* graphics, D2D1_RECT_F area)
 }
 
 
+
+//---------------------------------
+//=======================
+// DECONSTRUCTORS
+//=======================
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Deconstructor for the object.
+* \details Any COM objects that are used within the object
+*	must be released.
+* \param None
+* \return None
 */
 GameObject::~GameObject()
 {
@@ -43,10 +54,10 @@ GameObject::~GameObject()
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Initialization of the game object.
+* \details The initialization process will load bitmap resources from file.
+* \param fileName - LPCWSTR - The filename to the resource
+* \return void
 */
 void GameObject::Init(LPCWSTR fileName)
 {
@@ -57,13 +68,16 @@ void GameObject::Init(LPCWSTR fileName)
 
 
 /**
-* \brief
-* \details
-* \param left - float
-* \param top - float 
-* \param right - float 
-* \param bottom - float
-* \return
+* \brief Draws the game object to the screen.
+* \details Using the Direct2D device context, the game
+*	object is drawn to the screen. Four points must be specified
+*	for the bitmap to be drawn to the screen. As well, the dimensions
+*	of the screen is included to draw the image to the specified screen.
+* \param left - float - The left of the rectangle
+* \param top - float - The top of the rectangle
+* \param right - float - The right of the rectangle
+* \param bottom - float - The bottom of the rectangle
+* \return void
 */
 void GameObject::Draw(float left, float top, float right, float bottom)
 {

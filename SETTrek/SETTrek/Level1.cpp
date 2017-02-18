@@ -10,10 +10,11 @@
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Loading all the game assets for this level.
+* \details The method will load all the assets and setting
+*	the values for this current level.
+* \param size - D2D1_RECT_F - The dimensions of the window
+* \return void
 */
 void Level1::Load(D2D1_RECT_F size)
 {
@@ -21,8 +22,8 @@ void Level1::Load(D2D1_RECT_F size)
 	srand((unsigned int)time(NULL));
 
 	screenSize = size;
-	windowWidth = screenSize.right;		// Original: 1024
-	windowHeight = screenSize.bottom;	// Original: 768, 729, 772
+	windowWidth = screenSize.right;
+	windowHeight = screenSize.bottom;
 
 	gridWidth = windowWidth / kNumberOfGrid;
 	gridHeight = windowHeight / kNumberOfGrid;
@@ -93,10 +94,9 @@ void Level1::Load(D2D1_RECT_F size)
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Unloading any resources or assets from the level.
+* \param void
+* \return void
 */
 void Level1::Unload(void)
 {
@@ -135,17 +135,16 @@ void Level1::Update(void)
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Render the game objects to the screen.
+* \details For this particular level, the game objects
+*	are drawn to the screen.
 */
 void Level1::Render(void)
 {
 	//1. Draw the Background before other objects
 	pBackground->Draw(0, 0, windowWidth, windowHeight);
 
-	// 3. Draw the random-chanced Planets
+	// 2. Draw the random-chanced Planets
 	for (int i = 0; i < randCoord.size(); ++i)
 	{
 		chosenPlanets[i]->Draw(
@@ -156,17 +155,17 @@ void Level1::Render(void)
 		);
 	}
 
-	// 2. Draw the Starship
+	// 3. Draw the Starship
 	pStarShip->Draw(pStarShip->GetX1(), grid[kCenterGrid].second,
 		pStarShip->GetX1() + gridWidth, grid[kCenterGrid].second + gridHeight);
 }
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Generating the grid for this level. 
+* \details The grid is a 10 by 10 grid. In total there are
+*	100 grids in the area. The absolute position is calculated
+*	from each grid-point.
 */
 void Level1::GenerateGrid(void)
 {
@@ -191,10 +190,10 @@ void Level1::GenerateGrid(void)
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Generate a random grid coordinate for spawning the planet.
+* \details The random grid generation chooses a grid point from
+*	the already generated points. For each grid point, a 5% chance
+*	that a planet may be spawned happens.
 */
 void Level1::GenerateRandomCoord(void)
 {
@@ -223,10 +222,9 @@ void Level1::GenerateRandomCoord(void)
 
 
 /**
-* \brief
-* \details
-* \param
-* \return
+* \brief Generate the random planet to spawn on to the chosen grids.
+* \param void
+* \return void
 */
 void Level1::GenerateRandomPlanet(void)
 {

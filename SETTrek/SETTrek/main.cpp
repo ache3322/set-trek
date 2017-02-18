@@ -79,7 +79,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 
 	// The rectangle specifys a width x height which will be  the size of the window
 	// Default: 1024 by 768
-	RECT rect = { 0, 0, 400, 300 };
+	RECT rect = { 0, 0, kDefaultScreenWidth, kDefaultScreenHeight };
 	AdjustWindowRectEx(&rect, WS_OVERLAPPED, false, WS_EX_OVERLAPPEDWINDOW);
 
 	// We need to use rect because without using rect, the window will clip off a bit of dps to adjust for margins...

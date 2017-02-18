@@ -4,6 +4,8 @@
 * PROGRAMMER	: Austin Che
 * DATE			: 2017/01/25
 * DESCRIPTION	: The header file containing the class definition for the Graphics.
+* CREDIT: https://www.youtube.com/user/WhatsACreel
+*	Credit to the Youtuber What's A Creel for the composition of the game engine.
 */
 #pragma once
 #include <Windows.h>

@@ -16,6 +16,7 @@
 *	will look for a specified color and will "remove" it.
 * \param gfx - Graphics* - A reference to the Graphics object
 * \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
+* \return ID2D1Effect* : The chroma key effect.
 */
 ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1)
 {
@@ -30,6 +31,134 @@ ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1)
 	HRESULT hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_COLOR, D2D1::Vector3F(0.0f, 1.0f, 0.0f));
 	// TODO: Pass in float to control tolerance?
 	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_TOLERANCE, 0.15f);
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_INVERT_ALPHA, 0);
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_FEATHER, 1);
+
+	return chroma;
+}
+
+
+/**
+* \brief Creating a chroma key effect.
+* \details Creating a chroma key effect. A bitmap source must
+*	be passed in to create the effect out of it. The chroma effect
+*	will look for a specified color and will "remove" it. As well, this
+*	method takes in a tolerance. By default, the "green" is removed.
+* \param gfx - Graphics* - A reference to the Graphics object
+* \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
+* \param tolerance - float - 
+* \return ID2D1Effect* : The chroma key effect.
+*/
+ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, float tolerance)
+{
+	ID2D1Effect* chroma = NULL;
+
+	// Create the chromakey effect
+	gfx->GetDeviceContext()->CreateEffect(CLSID_D2D1ChromaKey, &chroma);
+
+	// The bitmap that will be chromakeyed
+	chroma->SetInput(0, bmp1);
+	// RGB Channel - R, G, B, A
+	HRESULT hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_COLOR, D2D1::Vector3F(0.0f, 1.0f, 0.0f));
+	// TODO: Pass in float to control tolerance?
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_TOLERANCE, tolerance);
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_INVERT_ALPHA, 0);
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_FEATHER, 1);
+
+	return chroma;
+}
+
+
+/**
+* \brief Creating a chroma key effect.
+* \details Creating a chroma key effect. A bitmap source must
+*	be passed in to create the effect out of it. The chroma effect
+*	will look for a specified color and will "remove" it. As well, this
+*	method takes in a tolerance. By default, the "green" is removed.
+* \param gfx - Graphics* - A reference to the Graphics object
+* \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
+* \param tolerance - float -
+* \param isFeather - int - Whether feathering effect is applied to the bitmap
+* \return ID2D1Effect* : The chroma key effect.
+*/
+ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, float tolerance, int isFeather)
+{
+	ID2D1Effect* chroma = NULL;
+
+	// Create the chromakey effect
+	gfx->GetDeviceContext()->CreateEffect(CLSID_D2D1ChromaKey, &chroma);
+
+	// The bitmap that will be chromakeyed
+	chroma->SetInput(0, bmp1);
+	// RGB Channel - R, G, B, A
+	HRESULT hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_COLOR, D2D1::Vector3F(0.0f, 1.0f, 0.0f));
+	// TODO: Pass in float to control tolerance?
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_TOLERANCE, tolerance);
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_INVERT_ALPHA, 0);
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_FEATHER, isFeather);
+
+	return chroma;
+}
+
+
+/**
+* \brief Creating a chroma key effect.
+* \details Creating a chroma key effect. A bitmap source must
+*	be passed in to create the effect out of it. The chroma effect
+*	will look for a specified color and will "remove" it. As well, this
+*	method takes in a tolerance. A vector3 is also passsed in for the color.
+* \param gfx - Graphics* - A reference to the Graphics object
+* \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
+* \param color - D2D1_VECTOR_3F -
+* \param tolerance - float -
+* \return ID2D1Effect* : The chroma key effect.
+*/
+ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, D2D1_VECTOR_3F color, float tolerance)
+{
+	ID2D1Effect* chroma = NULL;
+
+	// Create the chromakey effect
+	gfx->GetDeviceContext()->CreateEffect(CLSID_D2D1ChromaKey, &chroma);
+
+	// The bitmap that will be chromakeyed
+	chroma->SetInput(0, bmp1);
+	// RGB Channel - R, G, B, A
+	HRESULT hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_COLOR, color);
+	// TODO: Pass in float to control tolerance?
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_TOLERANCE, tolerance);
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_INVERT_ALPHA, 0);
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_FEATHER, 1);
+
+	return chroma;
+}
+
+
+/**
+* \brief Creating a chroma key effect.
+* \details Creating a chroma key effect. A bitmap source must
+*	be passed in to create the effect out of it. The chroma effect
+*	will look for a specified color and will "remove" it.
+* \param gfx - Graphics* - A reference to the Graphics object
+* \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
+* \param r - float
+* \param g - float
+* \param b - float
+* \param tolerance - float -
+* \return ID2D1Effect* : The chroma key effect.
+*/
+ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, float r, float g, float b, float tolerance)
+{
+	ID2D1Effect* chroma = NULL;
+
+	// Create the chromakey effect
+	gfx->GetDeviceContext()->CreateEffect(CLSID_D2D1ChromaKey, &chroma);
+
+	// The bitmap that will be chromakeyed
+	chroma->SetInput(0, bmp1);
+	// RGB Channel - R, G, B
+	HRESULT hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_COLOR, D2D1::Vector3F(r, g, b));
+	// TODO: Pass in float to control tolerance?
+	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_TOLERANCE, tolerance);
 	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_INVERT_ALPHA, 0);
 	hr = chroma->SetValue(D2D1_CHROMAKEY_PROP_FEATHER, 1);
 

@@ -19,13 +19,19 @@ class SpriteSheet
 {
 private:
 
+	LPCWSTR file;			//!< The file of the resource
 
 public:
 
 	/*-Constructor-*/
-	SpriteSheet(LPCWSTR filename, Graphics* gfx);
 	SpriteSheet(LPCWSTR filename, Graphics* gfx, ID2D1Bitmap** bmp);
 
 	/*-Destructor-*/
 	~SpriteSheet();
+
+	/*-Accessors-*/
+	LPCWSTR GetFile(void) const;
+
+	/*-Mutators-*/
+	void SetFile(LPCWSTR fileName);
 };

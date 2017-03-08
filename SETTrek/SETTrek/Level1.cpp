@@ -37,7 +37,6 @@ void Level1::Load(D2D1_RECT_F size)
 	unique_ptr<GameObject> starShipBase(new GameObject(gfx, screenSize));
 	unique_ptr<GameObject> starShipDetail(new GameObject(gfx, screenSize));
 
-
 	pBackground->Init(L".\\assets\\SectorBackground.bmp");
 	pStarShip->Init(L".\\assets\\ShipBase.bmp");
 	pPlanet1->Init(L".\\assets\\Planet1.bmp");
@@ -47,46 +46,47 @@ void Level1::Load(D2D1_RECT_F size)
 	starShipDetail->Init(L".\\assets\\ShipDetail.bmp");
 
 	//---------------------
+	// EffectManager stuff
 
 	ComPtr<ID2D1Effect> chromaKey;
 	// Do the Chroma Effect on each resource!
-	chromaKey = EffectManager::CreateChroma(gfx, pPlanet1->GetBitmap());
-	pPlanet1->SetBitmap(
-		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), pPlanet1->GetBitmapPixelSize())
+	chromaKey = EffectManager::CreateChroma(pPlanet1->GetBmp());
+	pPlanet1->SetBmp(
+		EffectManager::ConvertToBitmap(chromaKey.Get(), pPlanet1->GetBmpPixelSize())
 	);
 	chromaKey.Get()->Release();
 
-	chromaKey = EffectManager::CreateChroma(gfx, pPlanet2->GetBitmap());
-	pPlanet2->SetBitmap(
-		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), pPlanet2->GetBitmapPixelSize())
+	chromaKey = EffectManager::CreateChroma(pPlanet2->GetBmp());
+	pPlanet2->SetBmp(
+		EffectManager::ConvertToBitmap(chromaKey.Get(), pPlanet2->GetBmpPixelSize())
 	);
 	chromaKey.Get()->Release();
 
-	chromaKey = EffectManager::CreateChroma(gfx, pPlanet3->GetBitmap());
-	pPlanet3->SetBitmap(
-		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), pPlanet3->GetBitmapPixelSize())
+	chromaKey = EffectManager::CreateChroma(pPlanet3->GetBmp());
+	pPlanet3->SetBmp(
+		EffectManager::ConvertToBitmap(chromaKey.Get(), pPlanet3->GetBmpPixelSize())
 	);
 
 	//---------------------
 	ComPtr<ID2D1Effect> shipBaseEffect;
 	ComPtr<ID2D1Effect> shipDetailEffect;
 
-	shipBaseEffect = EffectManager::CreateChroma(gfx, starShipBase->GetBitmap());
-	starShipBase->SetBitmap(
-		EffectManager::ConvertToBitmap(gfx, shipBaseEffect.Get(), starShipBase->GetBitmapPixelSize())
+	shipBaseEffect = EffectManager::CreateChroma(starShipBase->GetBmp());
+	starShipBase->SetBmp(
+		EffectManager::ConvertToBitmap(shipBaseEffect.Get(), starShipBase->GetBmpPixelSize())
 	);
 
-	shipDetailEffect = EffectManager::CreateChroma(gfx, starShipDetail->GetBitmap());
-	starShipDetail->SetBitmap(
-		EffectManager::ConvertToBitmap(gfx, shipDetailEffect.Get(), starShipDetail->GetBitmapPixelSize())
+	shipDetailEffect = EffectManager::CreateChroma(starShipDetail->GetBmp());
+	starShipDetail->SetBmp(
+		EffectManager::ConvertToBitmap(shipDetailEffect.Get(), starShipDetail->GetBmpPixelSize())
 	);
 
 	//---------------------
 
 	// Do the composite on the ship
 	ComPtr<ID2D1Effect> compositeKey;
-	compositeKey = EffectManager::CreateComposite(gfx, starShipBase->GetBitmap(), starShipDetail->GetBitmap());
-	pStarShip->SetBitmap(EffectManager::ConvertToBitmap(gfx, compositeKey.Get(), pStarShip->GetBitmapPixelSize()));
+	compositeKey = EffectManager::CreateComposite(starShipBase->GetBmp(), starShipDetail->GetBmp());
+	pStarShip->SetBmp(EffectManager::ConvertToBitmap(compositeKey.Get(), pStarShip->GetBmpPixelSize()));
 	//--------------------
 
 	// Generate the grid positions/coordinates

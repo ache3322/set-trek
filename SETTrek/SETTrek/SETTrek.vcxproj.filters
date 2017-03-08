@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Level Headers">
+      <UniqueIdentifier>{f7749c96-df4c-4fee-a30d-15e5389b58e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Level Sources">
+      <UniqueIdentifier>{598fc6c9-7796-436f-a5e9-747667de719b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GameObj Headers">
+      <UniqueIdentifier>{20e29443-db59-4913-a5a4-75cd81b36f43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameObj Sources">
+      <UniqueIdentifier>{0d2a88e2-a064-48f4-aaa9-db8eb6e31232}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -27,17 +39,26 @@
     <ClCompile Include="SpriteSheet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Level.cpp">
+    <ClCompile Include="EffectManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Level1.cpp">
+      <Filter>Source Files\Level Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>Source Files\Level Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Grid.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Level2.cpp">
+      <Filter>Source Files\Level Sources</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\GameObj Sources</Filter>
     </ClCompile>
-    <ClCompile Include="EffectManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="MoveableObject.cpp">
+      <Filter>Source Files\GameObj Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,17 +71,26 @@
     <ClInclude Include="SpriteSheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Level.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Level1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EffectManager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>Header Files\Level Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Level1.h">
+      <Filter>Header Files\Level Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Level2.h">
+      <Filter>Header Files\Level Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Header Files\GameObj Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveableObject.h">
+      <Filter>Header Files\GameObj Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

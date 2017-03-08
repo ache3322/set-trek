@@ -30,6 +30,17 @@ using namespace Microsoft::WRL;	// For using ComPtr
 
 
 
+//=============================
+// GRAPHIC STRUCT DEFINITIONS
+//=============================
+struct VECTOR2
+{
+	float x;
+	float y;
+} typedef vector2;
+
+
+
 /**
 * \class Graphics
 * \brief The Graphics class provides the capabilities to utilize the Direct2D library.
@@ -76,6 +87,6 @@ public:
 	ID2D1DeviceContext* GetDeviceContext(void);
 
 	void ClearScreen(float r, float g, float b);
-	void DrawCircle(float c, float y, float radius, float r, float g, float b, float a);
+	void DrawCircle(float c, float y, float radius, float r, float g, float b, float a = 1.0f);
 	void DrawRectangle(float left, float top, float right, float bottom, float r, float g, float b, float a);
 };

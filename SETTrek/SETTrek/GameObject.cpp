@@ -96,33 +96,66 @@ void GameObject::Draw(float left, float top, float right, float bottom)
 
 
 
-ID2D1Bitmap* GameObject::GetBitmap(void)
+//---------------------------------
+//=======================
+// MUTATORS / SETTERS
+//=======================
+//-------------------------------------------------
+// METHOD: GetBmp
+/**
+* \brief Get the bitmap of the game object.
+* \param void
+* \return ID2D1Bitmap* : The bitmap of this object.
+*/
+ID2D1Bitmap* GameObject::GetBmp(void)
 {
 	return bitmap;
 }
-D2D1_SIZE_U GameObject::GetBitmapPixelSize(void)
+
+//-------------------------------------------------
+// METHOD: GetBmpPixelSize
+/**
+* \brief Get the bitmap pixel size.
+* \param void
+* \return D2D1_SIZE_U : The pixel size of the bitmap.
+*/
+D2D1_SIZE_U GameObject::GetBmpPixelSize(void)
 {
 	return bitmap->GetPixelSize();
 }
-float GameObject::GetX1(void)
-{
+
+float GameObject::GetX1(void) {
 	return x1;
 }
-float GameObject::GetY1(void)
-{
+
+float GameObject::GetY1(void) {
 	return y1;
 }
-float GameObject::GetX2(void)
-{
+
+float GameObject::GetX2(void) {
 	return x2;
 }
-float GameObject::GetY2(void)
-{
+
+float GameObject::GetY2(void) {
 	return y2;
 }
 
 
-void GameObject::SetBitmap(ID2D1Bitmap* bmp)
+
+//---------------------------------
+//=======================
+// MUTATORS / SETTERS
+//=======================
+//-------------------------------------------------
+// METHOD: SetBmp
+/**
+* \brief Set the bitmap of the game object.
+* \details If there is an old bitmap resource, clean up the
+*	bitmap resource. Then set the new bitmap resource.
+* \param bmp - ID2D1Bitmap* - The new bitmap
+* \return void
+*/
+void GameObject::SetBmp(ID2D1Bitmap* bmp)
 {
 	if (bitmap)
 	{
@@ -131,19 +164,19 @@ void GameObject::SetBitmap(ID2D1Bitmap* bmp)
 	}
 	bitmap = bmp;
 }
-void GameObject::SetX1(float x)
-{
+
+void GameObject::SetX1(float x) {
 	x1 = x;
 }
-void GameObject::SetY1(float y)
-{
+
+void GameObject::SetY1(float y) {
 	y1 = y;
 }
-void GameObject::SetX2(float x)
-{
+
+void GameObject::SetX2(float x) {
 	x2 = x;
 }
-void GameObject::SetY2(float y)
-{
+
+void GameObject::SetY2(float y) {
 	y2 = y;
 }

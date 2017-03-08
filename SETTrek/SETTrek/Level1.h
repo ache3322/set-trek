@@ -11,12 +11,14 @@
 #include "GameObject.h"
 #include <time.h>
 #include <vector>
+#include <memory>
 using namespace std;
 
 
 //-CONSTANTS
 #define kNumberOfGrid		10
 #define kCenterGrid			49
+#define kGridSquares		100
 
 
 
@@ -43,9 +45,11 @@ private:
 	GameObject* pPlanet2;			//!< The second planet
 	GameObject* pPlanet3;			//!< The third planet
 
-	vector<pair<float, float>> grid;			//!< Contains the absolute position for the 10 by 10 grid
-	vector<pair<float, float>> randCoord;		//!< Contains the grid coordinates of where a random planet may spawn
 	vector<GameObject *> chosenPlanets;			//!< Contains the planets (a random chance) that will be spawned
+
+	vector<vector2> v2Grid;						//!< Contains the absolute position for the 10 by 10 grid. There are 100 squares in total
+	vector<vector2> v2Rand;						//!< Contains the grid coordinates of where a random planet may spawn
+
 
 public:
 

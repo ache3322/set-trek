@@ -37,10 +37,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	if (uMsg == WM_SIZE)
 	{
-		//WORD hi = HIWORD(lParam);
-		//WORD lo = LOWORD(lParam);
-		//isResize = true;
-		//graphics->Resize(hwnd);
 	}
 
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);

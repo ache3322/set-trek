@@ -34,8 +34,9 @@ void Level1::Load(D2D1_RECT_F size)
 	pPlanet1 = new GameObject(gfx, screenSize);
 	pPlanet2 = new GameObject(gfx, screenSize);
 	pPlanet3 = new GameObject(gfx, screenSize);
-	GameObject* starShipBase = new GameObject(gfx, screenSize);
-	GameObject* starShipDetail = new GameObject(gfx, screenSize);
+	unique_ptr<GameObject> starShipBase(new GameObject(gfx, screenSize));
+	unique_ptr<GameObject> starShipDetail(new GameObject(gfx, screenSize));
+
 
 	pBackground->Init(L".\\assets\\SectorBackground.bmp");
 	pStarShip->Init(L".\\assets\\ShipBase.bmp");
@@ -53,25 +54,31 @@ void Level1::Load(D2D1_RECT_F size)
 	pPlanet1->SetBitmap(
 		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), pPlanet1->GetBitmapPixelSize())
 	);
+	chromaKey.Get()->Release();
 
 	chromaKey = EffectManager::CreateChroma(gfx, pPlanet2->GetBitmap());
 	pPlanet2->SetBitmap(
 		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), pPlanet2->GetBitmapPixelSize())
 	);
+	chromaKey.Get()->Release();
 
 	chromaKey = EffectManager::CreateChroma(gfx, pPlanet3->GetBitmap());
 	pPlanet3->SetBitmap(
 		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), pPlanet3->GetBitmapPixelSize())
 	);
 
-	chromaKey = EffectManager::CreateChroma(gfx, starShipBase->GetBitmap());
+	//---------------------
+	ComPtr<ID2D1Effect> shipBaseEffect;
+	ComPtr<ID2D1Effect> shipDetailEffect;
+
+	shipBaseEffect = EffectManager::CreateChroma(gfx, starShipBase->GetBitmap());
 	starShipBase->SetBitmap(
-		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), starShipBase->GetBitmapPixelSize())
+		EffectManager::ConvertToBitmap(gfx, shipBaseEffect.Get(), starShipBase->GetBitmapPixelSize())
 	);
 
-	chromaKey = EffectManager::CreateChroma(gfx, starShipDetail->GetBitmap());
+	shipDetailEffect = EffectManager::CreateChroma(gfx, starShipDetail->GetBitmap());
 	starShipDetail->SetBitmap(
-		EffectManager::ConvertToBitmap(gfx, chromaKey.Get(), starShipDetail->GetBitmapPixelSize())
+		EffectManager::ConvertToBitmap(gfx, shipDetailEffect.Get(), starShipDetail->GetBitmapPixelSize())
 	);
 
 	//---------------------
@@ -80,9 +87,6 @@ void Level1::Load(D2D1_RECT_F size)
 	ComPtr<ID2D1Effect> compositeKey;
 	compositeKey = EffectManager::CreateComposite(gfx, starShipBase->GetBitmap(), starShipDetail->GetBitmap());
 	pStarShip->SetBitmap(EffectManager::ConvertToBitmap(gfx, compositeKey.Get(), pStarShip->GetBitmapPixelSize()));
-
-	delete starShipBase;
-	delete starShipDetail;
 	//--------------------
 
 	// Generate the grid positions/coordinates
@@ -101,6 +105,7 @@ void Level1::Load(D2D1_RECT_F size)
 void Level1::Unload(void)
 {
 	// Clean up any resources
+	chosenPlanets.clear();
 	if (pBackground) delete pBackground;
 	if (pStarShip) delete pStarShip;
 	if (pPlanet1) delete pPlanet1;
@@ -126,9 +131,7 @@ void Level1::Update(void)
 		pStarShip->SetX1(0);
 
 		// Generate another random set of coordinates for the planets
-		randCoord.clear();
 		GenerateRandomCoord();
-		chosenPlanets.clear();
 		GenerateRandomPlanet();
 	}
 }
@@ -145,19 +148,33 @@ void Level1::Render(void)
 	pBackground->Draw(0, 0, windowWidth, windowHeight);
 
 	// 2. Draw the random-chanced Planets
-	for (int i = 0; i < randCoord.size(); ++i)
+	for (int i = 0; i < v2Rand.size(); ++i)
 	{
 		chosenPlanets[i]->Draw(
-			randCoord[i].first,
-			randCoord[i].second,
-			randCoord[i].first + gridWidth,
-			randCoord[i].second + gridHeight
+			v2Rand[i].x,
+			v2Rand[i].y,
+			v2Rand[i].x + gridWidth,
+			v2Rand[i].y + gridHeight
 		);
 	}
 
 	// 3. Draw the Starship
-	pStarShip->Draw(pStarShip->GetX1(), grid[kCenterGrid].second,
-		pStarShip->GetX1() + gridWidth, grid[kCenterGrid].second + gridHeight);
+	pStarShip->Draw(pStarShip->GetX1(), v2Grid[kCenterGrid].y,
+		pStarShip->GetX1() + gridWidth, v2Grid[kCenterGrid].y + gridHeight);
+
+
+	// DEBUG: SHOWING GRID POINTS
+	for (int i = 0; i < kGridSquares; ++i)
+	{
+		gfx->DrawCircle(
+			v2Grid[i].x,
+			v2Grid[i].y,
+			8.0,
+			255.0,
+			255.0,
+			255.0
+		);
+	}
 }
 
 
@@ -177,13 +194,10 @@ void Level1::GenerateGrid(void)
 		for (col = 0; col < kNumberOfGrid; ++col)
 		{
 			// The pair takes in pair coordinates: (x, y), (col, row)
-			pair<float, float> coordinate;
-
 			// The col is along the X-axis
-			coordinate.first = col * gridWidth;
 			// The row is along the Y-axis
-			coordinate.second = row * gridHeight;
-			grid.push_back(coordinate);
+			vector2 vCoord = { col*  gridWidth, row * gridHeight };
+			v2Grid.push_back(vCoord);
 		}
 	}
 }
@@ -198,22 +212,22 @@ void Level1::GenerateGrid(void)
 void Level1::GenerateRandomCoord(void)
 {
 	bool doSpawn = false;
+
+	v2Rand.clear();
 	
 	// For each grid position, calculate the chance
 	// for a planet to spawn. There is a 1 in 20 (5%) chance
 	// that a planet will spawn...
-	for (int i = 0; i < grid.size(); ++i)
+	for (int i = 0; i < v2Grid.size(); ++i)
 	{
 		doSpawn = (rand() % 100) < 5;
 
 		if (doSpawn)
 		{
-			// These are the chose grid positions where
-			// a planet is going to be drawn at
-			pair<float, float> coord;
-			coord.first = grid[i].first;
-			coord.second = grid[i].second;
-			randCoord.push_back(coord);
+			// These are the chosen grid positions 
+			// where a planet is going to be drawn at
+			vector2 vCoord = { v2Grid[i].x, v2Grid[i].y };
+			v2Rand.push_back(vCoord);
 
 			doSpawn = false;
 		}
@@ -230,10 +244,12 @@ void Level1::GenerateRandomPlanet(void)
 {
 	int randomChance = 0;
 
+	chosenPlanets.clear();
+
 	// For each chosen grid coordinate - we choose
 	// what planets to spawn at that coordinate. It
 	// could be Earth, Mars, or Jupiter
-	for (size_t i = 0; i < randCoord.size(); ++i)
+	for (int i = 0; i < v2Rand.size(); ++i)
 	{
 		randomChance = rand() % 3;
 		if (randomChance == 0) {

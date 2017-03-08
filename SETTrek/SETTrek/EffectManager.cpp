@@ -8,6 +8,22 @@
 #include "EffectManager.h"
 
 
+//-STATIC VARIABLE INSTANCE
+Graphics* EffectManager::gfx;
+
+
+/**
+* \brief Ensures the EffectManager has access to the Graphics object.
+* \param graphics - Graphics* - A reference to the Graphics object.
+*/
+void EffectManager::Init(Graphics* graphics)
+{
+	if (!gfx) {
+		gfx = graphics;
+	}
+}
+
+
 
 /**
 * \brief Creating a chroma key effect.
@@ -18,7 +34,7 @@
 * \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
 * \return ID2D1Effect* : The chroma key effect.
 */
-ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1)
+ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1)
 {
 	ID2D1Effect* chroma = NULL;
 
@@ -49,7 +65,7 @@ ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1)
 * \param tolerance - float - 
 * \return ID2D1Effect* : The chroma key effect.
 */
-ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, float tolerance)
+ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, float tolerance)
 {
 	ID2D1Effect* chroma = NULL;
 
@@ -81,7 +97,7 @@ ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, float
 * \param isFeather - int - Whether feathering effect is applied to the bitmap
 * \return ID2D1Effect* : The chroma key effect.
 */
-ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, float tolerance, int isFeather)
+ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, float tolerance, int isFeather)
 {
 	ID2D1Effect* chroma = NULL;
 
@@ -113,7 +129,7 @@ ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, float
 * \param tolerance - float -
 * \return ID2D1Effect* : The chroma key effect.
 */
-ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, D2D1_VECTOR_3F color, float tolerance)
+ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, D2D1_VECTOR_3F color, float tolerance)
 {
 	ID2D1Effect* chroma = NULL;
 
@@ -146,7 +162,7 @@ ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, D2D1_
 * \param tolerance - float -
 * \return ID2D1Effect* : The chroma key effect.
 */
-ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, float r, float g, float b, float tolerance)
+ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, float r, float g, float b, float tolerance)
 {
 	ID2D1Effect* chroma = NULL;
 
@@ -174,7 +190,7 @@ ID2D1Effect* EffectManager::CreateChroma(Graphics* gfx, ID2D1Bitmap* bmp1, float
 * \param bmp1 - ID2D1Bitmap* - A bitmap being composited
 * \param bmp2 - ID2D1Bitmap* - The second bitmap composited over the first bitmap
 */
-ID2D1Effect* EffectManager::CreateComposite(Graphics* gfx, ID2D1Bitmap* bmp1, ID2D1Bitmap* bmp2)
+ID2D1Effect* EffectManager::CreateComposite(ID2D1Bitmap* bmp1, ID2D1Bitmap* bmp2)
 {
 	ID2D1Effect* composite = NULL;
 
@@ -195,7 +211,7 @@ ID2D1Effect* EffectManager::CreateComposite(Graphics* gfx, ID2D1Bitmap* bmp1, ID
 * \param effect - ID2D1Effect* - The effect being transferred to the bitmap
 * \param size - D2D1_SIZE_U - The size of the bitmap or render target
 */
-ID2D1Bitmap1* EffectManager::ConvertToBitmap(Graphics* gfx, ID2D1Effect* effect, D2D1_SIZE_U size)
+ID2D1Bitmap1* EffectManager::ConvertToBitmap(ID2D1Effect* effect, D2D1_SIZE_U size)
 {
 	ComPtr<ID2D1Image> oldTarget;
 	ID2D1Bitmap1* newBitmap = NULL;
@@ -240,7 +256,7 @@ ID2D1Bitmap1* EffectManager::ConvertToBitmap(Graphics* gfx, ID2D1Effect* effect,
 * \param effect - ID2D1Image* - The image that is converted to a bitmap
 * \param size - D2D1_SIZE_U - The size of the bitmap or render target
 */
-ID2D1Bitmap1* EffectManager::ConvertToBitmap(Graphics* gfx, ID2D1Image* image, D2D1_SIZE_U size)
+ID2D1Bitmap1* EffectManager::ConvertToBitmap(ID2D1Image* image, D2D1_SIZE_U size)
 {
 	ComPtr<ID2D1Image> oldTarget;
 	ID2D1Bitmap1* newBitmap = NULL;

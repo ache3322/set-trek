@@ -8,14 +8,19 @@
 #include <Windows.h>
 #include "Graphics.h"
 #include "GameManager.h"
+#include "EffectManager.h"
 #include "Level.h"
 #include "Level1.h"
+#include "Level2.h"
 
 
 //-GLOBAL VARIABLES
 Graphics* graphics;
 volatile bool isResize;
 
+
+//-FUNCTION PROTOTYPES
+HWND initWindow(HINSTANCE hInstance, int nCmd);
 
 
 /**
@@ -37,6 +42,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	if (uMsg == WM_SIZE)
 	{
+		//WORD hi = HIWORD(lParam);
+		//WORD lo = LOWORD(lParam);
+		//isResize = true;
+		//graphics->Resize(hwnd);
 	}
 
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -54,9 +63,76 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 */
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int nCmdShow)
 {
-	//
-	// WNDCLASSEX is a structure to describe the Window.
-	//
+	// Initialize the Main Window
+	HWND windowHandle = initWindow(hInstance, nCmdShow);
+	if (!windowHandle)
+		return -1;
+
+	// Get the actual size of the game window
+	RECT windowSize;
+	GetClientRect(windowHandle, &windowSize);
+
+	// Initialize the Graphics object
+	graphics = new Graphics();
+	if (!graphics->Init(windowHandle))
+	{
+		delete graphics;
+		// An error occurred whilst initializing the graphics
+		return -1;
+	}
+
+	// Initialize the GameLevel (ensures Graphics object is known for all Levels)
+	Level::Init(graphics);
+	EffectManager::Init(graphics);
+
+	// Initialize the GameManager
+	GameManager::Init();
+	// Load the initial level
+	GameManager::LoadLevel(new Level2(), D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
+
+	// Now show/display the window
+	ShowWindow(windowHandle, nCmdShow);
+
+
+	/* GAMP LOOP */
+
+	MSG msg = { 0 };
+	while (msg.message != WM_QUIT)
+	{
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			DispatchMessage(&msg);
+		}
+		else
+		{
+			// Process input
+
+			// Update the game - any values, assets, coordinates, sizes
+			GameManager::Update();
+
+			// Rendering...
+			graphics->BeginDraw();
+			// Render the Game
+			GameManager::Render();
+			graphics->EndDraw();
+		}
+	}
+
+	GameManager::UnloadLevel();
+	delete graphics;
+	return 0;
+}
+
+
+/*
+* \brief Initialize the main window.
+* \param hInstance - HINSTANCE - The handle instance of the client
+* \param nCmd - int - Describes how the Window will be shown
+* \return HWND : A handle to the window.
+*/
+HWND initWindow(HINSTANCE hInstance, int nCmd)
+{
+	/* WNDCLASSEX is a structure to describe the Window. */
 	WNDCLASSEX windowclass;
 	// We have to zero the memory
 	ZeroMemory(&windowclass, sizeof(WNDCLASSEX));
@@ -81,60 +157,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 	// We need to use rect because without using rect, the window will clip off a bit of dps to adjust for margins...
 	HWND windowHandle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, "MainWindow", "SET Trek", WS_OVERLAPPEDWINDOW, 100, 100,
 		rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, 0);
-	if (!windowHandle) return -1;
 
-	// Get the actual size of the game window
-	RECT windowSize;
-	GetClientRect(windowHandle, &windowSize);
-
-	// Initialize the Graphics object
-	graphics = new Graphics();
-	if (!graphics->Init(windowHandle))
-	{
-		delete graphics;
-		// An error occurred whilst initializing the graphics
-		return -1;
-	}
-
-	// Initialize the GameLevel (ensures Graphics object is known for all Levels)
-	Level::Init(graphics);
-	// Initialize the GameManager
-	GameManager::Init();
-	// Load the initial level
-	GameManager::LoadLevel(new Level1(), D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
-
-	// Now show/display the window
-	ShowWindow(windowHandle, nCmdShow);
-
-
-	//
-	// THE GAME LOOP
-	//
-	MSG msg;
-	while (true)
-	{
-		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			DispatchMessage(&msg);
-		}
-		if (msg.message == WM_QUIT) {
-			// Exit out of the game
-			break;
-		}
-
-		// Update the game - any values, assets, coordinates, sizes
-		GameManager::Update();
-
-		// RENDERING!
-		graphics->BeginDraw();
-		// Render the Game
-		GameManager::Render();
-		graphics->EndDraw();
-
-		Sleep(500);
-	}
-
-
-	GameManager::UnloadLevel();
-	delete graphics;
-	return 0;
+	return windowHandle;
 }

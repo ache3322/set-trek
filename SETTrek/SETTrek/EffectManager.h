@@ -29,8 +29,8 @@ public:
 	static ID2D1Effect* CreateChroma(ID2D1Bitmap* bmp1);
 	static ID2D1Effect* CreateChroma(ID2D1Bitmap* bmp1, float tolerance);
 	static ID2D1Effect* CreateChroma(ID2D1Bitmap* bmp1, float tolerance, int isFeather);
-	static ID2D1Effect* CreateChroma(ID2D1Bitmap* bmp1, D2D1_VECTOR_3F color, float tolerance);
-	static ID2D1Effect* CreateChroma(ID2D1Bitmap* bmp1, float r, float g, float b, float tolerance);
+	static ID2D1Effect* CreateChroma(ID2D1Bitmap* bmp1, D2D1_VECTOR_3F color, float tolerance = 0.f);
+	static ID2D1Effect* CreateChroma(ID2D1Bitmap* bmp1, float r, float g, float b, float tolerance = 0.f);
 	static ID2D1Effect* CreateComposite(ID2D1Bitmap* bmp1, ID2D1Bitmap* bmp2);
 
 

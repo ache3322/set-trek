@@ -9,6 +9,7 @@
 */
 #pragma once
 #include <Windows.h>
+#include <cmath>
 
 // Newly Direct2D for Windows 8.1 and later
 #include <wrl.h>
@@ -25,6 +26,7 @@ using namespace Microsoft::WRL;	// For using ComPtr
 //=============================
 // GRAPHIC CONSTANTS
 //=============================
+#define PI                      (float)3.14159265
 #define kDefaultScreenWidth		1024
 #define kDefaultScreenHeight	768
 

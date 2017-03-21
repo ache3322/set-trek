@@ -19,6 +19,12 @@
 using namespace std;
 
 
+//===================
+// CONSTANTS
+//===================
+#define kXThreshold     3.0f
+#define kYThreshold     3.0f
+
 
 /**
 * \class Level1
@@ -36,7 +42,7 @@ private:
 
 	GameObject* pBackground;		//!< The background sprite
 	MoveableObject* pPlayer;		//!< The player starship - the U.S.S Conestoga
-	GameObject* pStarShip;			//!< The starship sprite
+    MoveableObject* pEnemy;         //!< The enemy start ship - the Klingon Bird of Prey
 	GameObject* pPlanet1;			//!< The first planet
 	GameObject* pPlanet2;			//!< The second planet
 	GameObject* pPlanet3;			//!< The third planet
@@ -50,6 +56,7 @@ public:
 	void Unload(void) override;					// For unloading assets from the game level
 	void Update(void) override;					// For updating the game level
 	void Render(void) override;					// For rendering the game level
+	void Process(int x, int y) override;		// For processing input from the user and applying to game level
 
 	void GenerateRandomPlanet(void);
 };

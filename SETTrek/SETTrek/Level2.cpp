@@ -8,6 +8,15 @@
 #include "Level2.h"
 
 
+float angle = 0.0f;
+float mouseXEnd = 0.0f;
+float mouseYEnd = 0.0f;
+
+float overallX = 0.0f;
+float overallY = 0.0f;
+float distance = 0.0f;
+D2D1::Matrix3x2F trans;
+
 
 /**
 * \brief Loading all the game assets for this level.
@@ -30,20 +39,21 @@ void Level2::Load(D2D1_RECT_F size)
 
 	// Loading the assets, resources, images, etc.
 	pBackground = new GameObject(gfx, screenSize);
-	pStarShip = new GameObject(gfx, screenSize);
 	pPlanet1 = new GameObject(gfx, screenSize);
 	pPlanet2 = new GameObject(gfx, screenSize);
 	pPlanet3 = new GameObject(gfx, screenSize);
 	unique_ptr<GameObject> starShipBase(new GameObject(gfx, screenSize));
 	unique_ptr<GameObject> starShipDetail(new GameObject(gfx, screenSize));
+    pEnemy = new MoveableObject(0, 0, gfx, screenSize);
 
 	pBackground->Init(L".\\assets\\SectorBackground.bmp");
-	pStarShip->Init(L".\\assets\\ShipBase.bmp");
 	pPlanet1->Init(L".\\assets\\Planet1.bmp");
 	pPlanet2->Init(L".\\assets\\Planet2.bmp");
 	pPlanet3->Init(L".\\assets\\Planet3.bmp");
 	starShipBase->Init(L".\\assets\\ShipBase.bmp");
 	starShipDetail->Init(L".\\assets\\ShipDetail.bmp");
+    pEnemy->Init(L".\\assets\\EnemyShip.bmp");
+
 
 	//---------------------
 	// Applying EffectManager effects
@@ -66,6 +76,13 @@ void Level2::Load(D2D1_RECT_F size)
 	pPlanet3->SetBmp(
 		EffectManager::ConvertToBitmap(chromaKey.Get(), pPlanet3->GetBmpPixelSize())
 	);
+    chromaKey.Get()->Release();
+    
+    // Loading the effect for the enemy ship
+    chromaKey = EffectManager::CreateChroma(pEnemy->GetBmp(), 0.0f, 0.0f, 1.0f, 0.15f);
+    pEnemy->SetBmp(
+        EffectManager::ConvertToBitmap(chromaKey.Get(), pEnemy->GetBmpPixelSize())
+    );
 
 	//---------------------
 	ComPtr<ID2D1Effect> shipBaseEffect;
@@ -86,12 +103,11 @@ void Level2::Load(D2D1_RECT_F size)
 	// Do the composite on the ship
 	ComPtr<ID2D1Effect> compositeKey;
 	compositeKey = EffectManager::CreateComposite(starShipBase->GetBmp(), starShipDetail->GetBmp());
-	pStarShip->SetBmp(EffectManager::ConvertToBitmap(compositeKey.Get(), pStarShip->GetBmpPixelSize()));
 
 	// DEBUG/TEST
-	pPlayer = new MoveableObject(5.0, 0, gfx, screenSize);
+	pPlayer = new MoveableObject(0, 0, gfx, screenSize);
 	pPlayer->Init(L".\\assets\\ShipBase.bmp");
-	pPlayer->SetBmp(EffectManager::ConvertToBitmap(compositeKey.Get(), pStarShip->GetBmpPixelSize()));
+	pPlayer->SetBmp(EffectManager::ConvertToBitmap(compositeKey.Get(), pPlayer->GetBmpPixelSize()));
 	// DEBUG/TEST
 
 	//--------------------
@@ -101,6 +117,18 @@ void Level2::Load(D2D1_RECT_F size)
 	grid->ConstructGrid();
 	grid->GenerateRandCoord();
 	GenerateRandomPlanet();
+
+
+    //--------------------
+    //-- Set the initial position of the StarShip
+    vector<vector2> v2Grid = grid->GetGrid();
+    pPlayer->SetX1(0);
+    pPlayer->SetX2(grid->GetWidth());
+    pPlayer->SetY1(v2Grid[kCenterGrid].y);
+    pPlayer->SetY2(v2Grid[kCenterGrid].y + grid->GetHeight());
+
+    mouseXEnd = pPlayer->GetX1();
+    mouseYEnd = pPlayer->GetY1();
 }
 
 
@@ -115,12 +143,35 @@ void Level2::Unload(void)
 	chosenPlanets.clear();
 	if (grid) delete grid;
 	if (pBackground) delete pBackground;
-	if (pStarShip) delete pStarShip;
 	if (pPlanet1) delete pPlanet1;
 	if (pPlanet2) delete pPlanet2;
 	if (pPlanet3) delete pPlanet3;
 
 	if (pPlayer) delete pPlayer;
+    if (pEnemy) delete pEnemy;
+}
+
+
+/**
+* \brief
+* \param x - int -
+* \param y - int - 
+*/
+void Level2::Process(int x, int y)
+{
+    // Get the current mouse click position
+    mouseXEnd = (float)x;
+    mouseYEnd = (float)y;
+
+    float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
+    float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
+
+    float deltaX = mouseXEnd - centerX;
+    float deltaY = mouseYEnd - centerY;
+    pPlayer->CalculateSpeed(deltaX, deltaY);
+
+    // Calculate the angle
+    angle = atan2f(deltaY, deltaX) * 180.f / PI;
 }
 
 
@@ -131,26 +182,65 @@ void Level2::Unload(void)
 */
 void Level2::Update(void)
 {
-	// The start ship moves grid to grid
-	pStarShip->SetX1(pStarShip->GetX1() + grid->GetWidth());
+    // The start ship moves grid to grid
+    //pStarShip->SetX1(pStarShip->GetX1() + grid->GetWidth());
 
-	// The Starship reached the end of "sector space" (edge of screen)
-	if (pStarShip->GetX1() > windowWidth)
-	{
-		// Reset the ship's position to the beginning
-		pStarShip->SetX1(0);
-	}
-
-	pPlayer->SetX1(pPlayer->GetX1() + pPlayer->GetSpeedX());
 	if (pPlayer->GetX1() > grid->GetWindowWidth())
 	{
 		pPlayer->SetX1(0);
-
 
 		// Generate another random set of coordinates for the planets
 		grid->GenerateRandCoord();
 		GenerateRandomPlanet();
 	}
+
+    float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
+    float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
+
+    // Moving the StarShip X-Axis logic
+    if (mouseXEnd > centerX + kXThreshold)
+    {
+        // Moving to the RIGHT
+        pPlayer->SetX1(pPlayer->GetX1() + pPlayer->GetSpeedX());
+        pPlayer->SetX2(pPlayer->GetX2() + pPlayer->GetSpeedX());
+    }
+    if (mouseXEnd < centerX - kXThreshold)
+    {
+        // Moving to the LEFT
+        pPlayer->SetX1(pPlayer->GetX1() + pPlayer->GetSpeedX());
+        pPlayer->SetX2(pPlayer->GetX2() + pPlayer->GetSpeedX());
+    }
+    // Moving the StarShip Y-Axis logic
+    if (mouseYEnd > centerY + kYThreshold)
+    {
+        // Moving DOWN
+        pPlayer->SetY1(pPlayer->GetY1() + pPlayer->GetSpeedY());
+        pPlayer->SetY2(pPlayer->GetY2() + pPlayer->GetSpeedY());
+    }
+    if (mouseYEnd < centerY - kYThreshold)
+    {
+        // Moving UP
+        pPlayer->SetY1(pPlayer->GetY1() + pPlayer->GetSpeedY());
+        pPlayer->SetY2(pPlayer->GetY2() + pPlayer->GetSpeedY());
+    }
+
+    trans = D2D1::Matrix3x2F::Translation(0, 0);
+
+    //===--------
+    // Prevent Starship from going off the left-side of screen
+    //
+    if (pPlayer->GetX1() < 0)
+    {
+        pPlayer->SetX1(0);
+        pPlayer->SetX2(0 + grid->GetWidth());
+    }
+    if (pPlayer->GetY1() < 0)
+    {
+        pPlayer->SetY1(0);
+        pPlayer->SetY2(grid->GetHeight());
+    }
+    //
+    //===--------
 }
 
 
@@ -181,25 +271,18 @@ void Level2::Render(void)
 
 	// 3. Draw the Starship
 	vector<vector2> v2Grid = grid->GetGrid();
-	pStarShip->Draw(pStarShip->GetX1(), v2Grid[kCenterGrid].y,
-		pStarShip->GetX1() + gridWidth, v2Grid[kCenterGrid].y + gridHeight);
 
-	//------------------------------
-	// DEBUG: SHOWING GRID POINTS
-	for (int i = 0; i < v2Grid.size(); ++i)
-	{
-		gfx->DrawCircle(
-			v2Grid[i].x,
-			v2Grid[i].y,
-			8.0,
-			255.0,
-			255.0,
-			255.0
-		);
-	}
+    D2D1_POINT_2F center = pPlayer->GetCenter();
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Rotation(angle, center) * trans);
 
-	pPlayer->Draw(pPlayer->GetX1(), v2Grid[kCenterGrid].y,
-		pPlayer->GetX1() + gridWidth, v2Grid[kCenterGrid].y + gridHeight);
+	pPlayer->Draw(pPlayer->GetX1(), pPlayer->GetY1(),
+		pPlayer->GetX2(), pPlayer->GetY2());
+
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
+
+
+    //==----
+    // 4. Draw the Klingon Bird of Pray
 }
 
 /**

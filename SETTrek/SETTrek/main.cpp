@@ -6,6 +6,7 @@
 * DESCRIPTION	: The main entry point for the game.
 */
 #include <Windows.h>
+#include <Windowsx.h>
 #include "Graphics.h"
 #include "GameManager.h"
 #include "EffectManager.h"
@@ -17,6 +18,9 @@
 //-GLOBAL VARIABLES
 Graphics* graphics;
 volatile bool isResize;
+volatile bool isClick = false;
+int xMousePos = 0;
+int yMousePos = 0;
 
 
 //-FUNCTION PROTOTYPES
@@ -46,6 +50,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		//WORD lo = LOWORD(lParam);
 		//isResize = true;
 		//graphics->Resize(hwnd);
+	}
+	if (uMsg == WM_LBUTTONDOWN)
+	{
+		xMousePos = GET_X_LPARAM(lParam);
+		yMousePos = GET_Y_LPARAM(lParam);
+        isClick = true;
+		OutputDebugString("Mouse-click down!");
 	}
 
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -94,8 +105,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 	ShowWindow(windowHandle, nCmdShow);
 
 
+    //==---
 	/* GAMP LOOP */
-
+    //==---
 	MSG msg = { 0 };
 	while (msg.message != WM_QUIT)
 	{
@@ -106,6 +118,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 		else
 		{
 			// Process input
+            if (isClick) {
+                GameManager::Process(xMousePos, yMousePos);
+                isClick = false;
+            }
 
 			// Update the game - any values, assets, coordinates, sizes
 			GameManager::Update();
@@ -157,6 +173,8 @@ HWND initWindow(HINSTANCE hInstance, int nCmd)
 	// We need to use rect because without using rect, the window will clip off a bit of dps to adjust for margins...
 	HWND windowHandle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, "MainWindow", "SET Trek", WS_OVERLAPPEDWINDOW, 100, 100,
 		rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, 0);
+
+    yMousePos = (rect.bottom + rect.top) / 2;
 
 	return windowHandle;
 }

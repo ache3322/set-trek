@@ -27,4 +27,5 @@ public:
 	virtual void Unload(void) = 0;				// For unloading assets from the game level
 	virtual void Update(void) = 0;				// For updating the game level
 	virtual void Render(void) = 0;				// For rendering the game level
+	virtual void Process(int x, int y) = 0;		// For processing input
 };

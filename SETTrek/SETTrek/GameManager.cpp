@@ -98,3 +98,16 @@ void GameManager::Update(void)
 	}
 	currentLevel->Update();
 }
+
+
+/**
+* \brief Process the input from the player.
+* \details The input from the player could be a mouse-click event.
+*/
+void GameManager::Process(int mouseX, int mouseY)
+{
+	if (IsLoading) {
+		return;
+	}
+	currentLevel->Process(mouseX, mouseY);
+}

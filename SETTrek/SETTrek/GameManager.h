@@ -37,4 +37,5 @@ public:
 	static void Init(void);
 	static void Render(void);
 	static void Update(void);
+	static void Process(int mouseX, int mouseY);
 };

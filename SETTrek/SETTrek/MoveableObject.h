@@ -11,6 +11,12 @@
 #include "GameObject.h"
 
 
+//===================
+// CONSTANTS
+//===================
+#define kConstSpeed     2.0f
+
+
 /**
 * \class MoveableObject
 * \brief The MoveableObject encapsulates the attributes of a moving game object.
@@ -30,6 +36,9 @@ public:
 
 	//-Destructor
 	~MoveableObject(void);
+
+    //-Methods
+    void CalculateSpeed(float deltaX, float deltaY);
 
 	//-Accessors
 	float GetSpeedX(void) const;

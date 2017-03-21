@@ -49,10 +49,11 @@ public:
 	//-Accessors
 	ID2D1Bitmap* GetBmp(void);
 	D2D1_SIZE_U GetBmpPixelSize(void);
-	float GetX1(void);
-	float GetY1(void);
-	float GetX2(void);
-	float GetY2(void);
+    D2D1_POINT_2F GetCenter(void);
+	virtual float GetX1(void);
+    virtual float GetY1(void);
+    virtual float GetX2(void);
+    virtual float GetY2(void);
 
 	//-Mutators
 	void SetBmp(ID2D1Bitmap* bmp);

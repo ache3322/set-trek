@@ -28,11 +28,11 @@ MoveableObject::MoveableObject(Graphics* graphics, D2D1_RECT_F area)
 }
 
 
-MoveableObject::MoveableObject(float x, float y, Graphics* graphics, D2D1_RECT_F area)
+MoveableObject::MoveableObject(float xSpeed, float ySpeed, Graphics* graphics, D2D1_RECT_F area)
 	: GameObject(graphics, area)
 {
-	speedX = x;
-	speedY = y;
+	speedX = xSpeed;
+	speedY = ySpeed;
 }
 
 
@@ -50,6 +50,23 @@ MoveableObject::MoveableObject(float x, float y, Graphics* graphics, D2D1_RECT_F
 */
 MoveableObject::~MoveableObject()
 {
+}
+
+
+
+//---------------------------------
+//=======================
+// DECONSTRUCTORS
+//=======================
+void MoveableObject::CalculateSpeed(float deltaX, float deltaY)
+{
+    // distance = sqr (deltaX^2 + deltaY^2);
+    float distance = sqrtf(deltaX * deltaX + deltaY * deltaY);
+    float overallX = deltaX * kConstSpeed / distance;
+    float overallY = deltaY * kConstSpeed / distance;
+
+    SetSpeedX(overallX);
+    SetSpeedY(overallY);
 }
 
 

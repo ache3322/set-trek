@@ -85,15 +85,14 @@ void GameObject::Draw(float left, float top, float right, float bottom)
 	// will be drawn, relative to the source (area) rectangle
 	// The rectangle needs 4 points to be drawn!
 	D2D1_RECT_F destRect = D2D1::RectF(left, top, right, bottom);
-
-	gfx->GetDeviceContext()->DrawBitmap(
-		bitmap,
-		destRect,
-		1.0f,
-		D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
-		renderArea);
+    
+    gfx->GetDeviceContext()->DrawBitmap(
+        bitmap,
+        destRect,
+        1.0f,
+        D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
+        renderArea);
 }
-
 
 
 //---------------------------------
@@ -122,6 +121,15 @@ ID2D1Bitmap* GameObject::GetBmp(void)
 D2D1_SIZE_U GameObject::GetBmpPixelSize(void)
 {
 	return bitmap->GetPixelSize();
+}
+
+D2D1_POINT_2F GameObject::GetCenter(void) {
+    float left = GetX1();
+    float right = GetX2();
+    float top = GetY1();
+    float bottom = GetY2();
+
+    return D2D1::Point2F((left + right) / 2, (top + bottom) / 2);
 }
 
 float GameObject::GetX1(void) {

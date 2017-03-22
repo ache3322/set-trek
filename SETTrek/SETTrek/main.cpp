@@ -56,7 +56,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		xMousePos = GET_X_LPARAM(lParam);
 		yMousePos = GET_Y_LPARAM(lParam);
         isClick = true;
-		OutputDebugString("Mouse-click down!");
 	}
 
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);

@@ -25,6 +25,7 @@ MoveableObject::MoveableObject(Graphics* graphics, D2D1_RECT_F area)
 {
 	speedX = 0.0f;
 	speedY = 0.0f;
+    angle = 0.0f;
 }
 
 
@@ -33,6 +34,7 @@ MoveableObject::MoveableObject(float xSpeed, float ySpeed, Graphics* graphics, D
 {
 	speedX = xSpeed;
 	speedY = ySpeed;
+    angle = 0.0f;
 }
 
 
@@ -56,19 +58,31 @@ MoveableObject::~MoveableObject()
 
 //---------------------------------
 //=======================
-// DECONSTRUCTORS
+// CALCULATIONS
 //=======================
 void MoveableObject::CalculateSpeed(float deltaX, float deltaY)
 {
     // distance = sqr (deltaX^2 + deltaY^2);
     float distance = sqrtf(deltaX * deltaX + deltaY * deltaY);
-    float overallX = deltaX * kConstSpeed / distance;
-    float overallY = deltaY * kConstSpeed / distance;
+    float overallX = 0.0f;
+    float overallY = 0.0f;
+    if (distance != 0)
+    {
+        overallX = deltaX * kConstSpeed / distance;
+        overallY = deltaY * kConstSpeed / distance;
 
-    SetSpeedX(overallX);
-    SetSpeedY(overallY);
+        SetSpeedX(overallX);
+        SetSpeedY(overallY);
+    }
 }
 
+
+void MoveableObject::CalculateAngle(float opposite, float ajacent)
+{
+    float a = atan2f(opposite, ajacent) * 180.f / PI;
+
+    SetAngle(a);
+}
 
 
 //---------------------------------
@@ -90,10 +104,19 @@ float MoveableObject::GetCenterY(void)
 {
 	return (GameObject::GetY1() + GameObject::GetY2()) / 2;
 }
+float MoveableObject::GetAngle(void)
+{
+    return angle;
+}
+
 
 void MoveableObject::SetSpeedX(float x) {
 	speedX = x;
 }
 void MoveableObject::SetSpeedY(float y) {
 	speedY = y;
+}
+void MoveableObject::SetAngle(float a)
+{
+    angle = a;
 }

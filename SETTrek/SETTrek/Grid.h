@@ -16,7 +16,7 @@ using namespace std;
 //===================
 // CONSTANTS
 //===================
-#define kNumberOfGrid		10
+#define kNumberOfGrid		15
 #define kCenterGrid			49
 
 

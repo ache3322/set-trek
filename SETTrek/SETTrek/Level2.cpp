@@ -8,15 +8,10 @@
 #include "Level2.h"
 
 
-float angle = 0.0f;
+float enemyAngle = 0.0f;
 float mouseXEnd = 0.0f;
 float mouseYEnd = 0.0f;
-
 bool isPlayerMoving = false;
-
-float overallX = 0.0f;
-float overallY = 0.0f;
-float distance = 0.0f;
 D2D1::Matrix3x2F trans;
 
 
@@ -46,7 +41,7 @@ void Level2::Load(D2D1_RECT_F size)
 	pPlanet3 = new GameObject(gfx, screenSize);
 	unique_ptr<GameObject> starShipBase(new GameObject(gfx, screenSize));
 	unique_ptr<GameObject> starShipDetail(new GameObject(gfx, screenSize));
-    pEnemy = new MoveableObject(1.0f, 1.0f, gfx, screenSize);
+    pEnemy = new MoveableObject(1.f, 1.f, gfx, screenSize);
 
 	pBackground->Init(L".\\assets\\SectorBackground.bmp");
 	pPlanet1->Init(L".\\assets\\Planet1.bmp");
@@ -87,12 +82,12 @@ void Level2::Load(D2D1_RECT_F size)
 	ComPtr<ID2D1Effect> shipBaseEffect;
 	ComPtr<ID2D1Effect> shipDetailEffect;
 
-	shipBaseEffect = EffectManager::CreateChroma(starShipBase->GetBmp());
+	shipBaseEffect = EffectManager::CreateChroma(starShipBase->GetBmp(), 0.25f, 0);
 	starShipBase->SetBmp(
 		EffectManager::ConvertToBitmap(shipBaseEffect.Get(), starShipBase->GetBmpPixelSize())
 	);
 
-	shipDetailEffect = EffectManager::CreateChroma(starShipDetail->GetBmp());
+	shipDetailEffect = EffectManager::CreateChroma(starShipDetail->GetBmp(), 0.1f, 1);
 	starShipDetail->SetBmp(
 		EffectManager::ConvertToBitmap(shipDetailEffect.Get(), starShipDetail->GetBmpPixelSize())
 	);
@@ -126,8 +121,10 @@ void Level2::Load(D2D1_RECT_F size)
     pPlayer->SetY1(v2Grid[kCenterGrid].y);
     pPlayer->SetY2(v2Grid[kCenterGrid].y + grid->GetHeight());
 
-    mouseXEnd = pPlayer->GetX1();
-    mouseYEnd = pPlayer->GetY1();
+    mouseXEnd = pPlayer->GetCenterX();
+    mouseYEnd = pPlayer->GetCenterY();
+
+    isPlayerMoving = false;
 
 	//--------------------
 	//-- Set the initial position of the Enemy Ship
@@ -178,9 +175,9 @@ void Level2::Process(int x, int y)
     pPlayer->CalculateSpeed(deltaX, deltaY);
 
     // Calculate the angle
-    angle = atan2f(deltaY, deltaX) * 180.f / PI;
+    pPlayer->CalculateAngle(deltaY, deltaX);
 
-	isPlayerMoving = true;
+	//isPlayerMoving = true;
 }
 
 
@@ -191,94 +188,84 @@ void Level2::Process(int x, int y)
 */
 void Level2::Update(void)
 {
+
+    float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
+    float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
+    float enemyDeltaX = pPlayer->GetCenterX() - pEnemy->GetCenterX();
+    float enemyDeltaY = pPlayer->GetCenterY() - pEnemy->GetCenterY();
+    pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY);
+
     // The start ship moves grid to grid
     //pStarShip->SetX1(pStarShip->GetX1() + grid->GetWidth());
 
-	if (pPlayer->GetX1() > grid->GetWindowWidth())
-	{
-		pPlayer->SetX1(0);
+    if (isPlayerMoving)
+    {
+        //===--------
+        // Enemy Movement
+        //
+        if (centerX > pEnemy->GetCenterX() + kXThreshold)
+        {
+            pEnemy->SetX1(pEnemy->GetX1() + pEnemy->GetSpeedX());
+            pEnemy->SetX2(pEnemy->GetX2() + pEnemy->GetSpeedX());
+        }
+        if (centerX < pEnemy->GetCenterX() - kXThreshold)
+        {
+            pEnemy->SetX1(pEnemy->GetX1() - pEnemy->GetSpeedX());
+            pEnemy->SetX2(pEnemy->GetX2() - pEnemy->GetSpeedX());
+        }
+        if (centerY > pEnemy->GetCenterY() + kYThreshold)
+        {
+            pEnemy->SetY1(pEnemy->GetY1() + pEnemy->GetSpeedY());
+            pEnemy->SetY2(pEnemy->GetY2() + pEnemy->GetSpeedY());
+        }
+        if (centerY < pEnemy->GetCenterY() - kYThreshold)
+        {
+            pEnemy->SetY1(pEnemy->GetY1() - pEnemy->GetSpeedY());
+            pEnemy->SetY2(pEnemy->GetY2() - pEnemy->GetSpeedY());
+        }
 
-		// Generate another random set of coordinates for the planets
-		grid->GenerateRandCoord();
-		GenerateRandomPlanet();
-	}
+        if (pEnemy->GetX2() < 0)
+        {
+            vector<vector2> v2Grid = grid->GetGrid();
+            pEnemy->SetX1(v2Grid[kCenterGrid].x);
+            pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
+        }
+        enemyAngle = 180.f + (atan2f(enemyDeltaY, enemyDeltaX) * 180.f / PI);
 
-	float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
-	float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
-
-	if (isPlayerMoving)
-	{
-		if (centerX > pEnemy->GetCenterX() + kXThreshold)
-		{
-			pEnemy->SetX1(pEnemy->GetX1() + pEnemy->GetSpeedX());
-			pEnemy->SetX2(pEnemy->GetX2() + pEnemy->GetSpeedX());
-		}
-		if (centerX < pEnemy->GetCenterX() - kXThreshold)
-		{
-			pEnemy->SetX1(pEnemy->GetX1() - pEnemy->GetSpeedX());
-			pEnemy->SetX2(pEnemy->GetX2() - pEnemy->GetSpeedX());
-		}
-		if (centerY > pEnemy->GetCenterY() + kYThreshold)
-		{
-			pEnemy->SetY1(pEnemy->GetY1() + pEnemy->GetSpeedY());
-			pEnemy->SetY2(pEnemy->GetY2() + pEnemy->GetSpeedY());
-		}
-		if (centerY < pEnemy->GetCenterY() - kYThreshold)
-		{
-			pEnemy->SetY1(pEnemy->GetY1() - pEnemy->GetSpeedY());
-			pEnemy->SetY2(pEnemy->GetY2() - pEnemy->GetSpeedY());
-		}
-	}
-
-	if (pEnemy->GetX2() < 0)
-	{
-		vector<vector2> v2Grid = grid->GetGrid();
-		pEnemy->SetX1(v2Grid[kCenterGrid].x);
-		pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
-	}
+        string output = "Enemy angle : " + to_string(enemyAngle) + "\n";
+        OutputDebugStringA(output.c_str());
+    }
+    //if (enemyAngle > 360.0f)
+    //{
+    //    enemyAngle = 0.0f;
+    //}
+    //
+    //===--------
 
 	//===--------
 	// Player Ship Movement
 	//
-    // Moving the StarShip X-Axis logic
-    if (mouseXEnd > centerX + kXThreshold)
-    {
-        // Moving to the RIGHT
-        pPlayer->SetX1(pPlayer->GetX1() + pPlayer->GetSpeedX());
-        pPlayer->SetX2(pPlayer->GetX2() + pPlayer->GetSpeedX());
-    }
-    if (mouseXEnd < centerX - kXThreshold)
-    {
-        // Moving to the LEFT
-        pPlayer->SetX1(pPlayer->GetX1() + pPlayer->GetSpeedX());
-        pPlayer->SetX2(pPlayer->GetX2() + pPlayer->GetSpeedX());
-    }
-    // Moving the StarShip Y-Axis logic
-    if (mouseYEnd > centerY + kYThreshold)
-    {
-        // Moving DOWN
-        pPlayer->SetY1(pPlayer->GetY1() + pPlayer->GetSpeedY());
-        pPlayer->SetY2(pPlayer->GetY2() + pPlayer->GetSpeedY());
-    }
-    if (mouseYEnd < centerY - kYThreshold)
-    {
-        // Moving UP
-        pPlayer->SetY1(pPlayer->GetY1() + pPlayer->GetSpeedY());
-        pPlayer->SetY2(pPlayer->GetY2() + pPlayer->GetSpeedY());
-    }
-
-	if ( (mouseXEnd < centerX + kXThreshold) && (mouseXEnd > centerX - kXThreshold) )
+	if ( (mouseXEnd < centerX + kXThreshold) && (mouseXEnd > centerX - kXThreshold) 
+        && (mouseYEnd < centerY + kYThreshold) && (mouseYEnd > centerY - kYThreshold) )
 	{
 		isPlayerMoving = false;
+        pPlayer->SetSpeedX(0);
+        pPlayer->SetSpeedY(0);
 	}
-
-    trans = D2D1::Matrix3x2F::Translation(0, 0);
+    else
+    {
+        isPlayerMoving = true;
+        pPlayer->SetX1(pPlayer->GetX1() + pPlayer->GetSpeedX());
+        pPlayer->SetX2(pPlayer->GetX2() + pPlayer->GetSpeedX());
+        pPlayer->SetY1(pPlayer->GetY1() + pPlayer->GetSpeedY());
+        pPlayer->SetY2(pPlayer->GetY2() + pPlayer->GetSpeedY());
+    }
 	//
 	//===--------
 
 
     //===--------
-    // Prevent Starship from going off the left-side of screen
+    // Starship Window Boundaries Check
     //
     if (pPlayer->GetX1() < 0)
     {
@@ -287,9 +274,28 @@ void Level2::Update(void)
     }
     if (pPlayer->GetY1() < 0)
     {
+        pPlayer->SetY1(grid->GetWindowHeight() - grid->GetHeight());
+        pPlayer->SetY2(grid->GetWindowHeight());
+    }
+
+    // CHECK if right-side of Player leaves right screen
+    if (pPlayer->GetX2() > grid->GetWindowWidth() - 5.0f)
+    {
+        pPlayer->SetX1(0);
+        pPlayer->SetX2(0 + grid->GetWidth());
+        // Generate another random set of coordinates for the planets
+        grid->GenerateRandCoord();
+        GenerateRandomPlanet();
+    }
+    if (pPlayer->GetY2() > grid->GetWindowHeight() - 5.0f)
+    {
         pPlayer->SetY1(0);
         pPlayer->SetY2(grid->GetHeight());
+        // Generate another random set of coordinates for the planets
+        grid->GenerateRandCoord();
+        GenerateRandomPlanet();
     }
+
     //
     //===--------
 }
@@ -320,22 +326,31 @@ void Level2::Render(void)
 		);
 	}
 
+    //==----
 	// 3. Draw the Starship
 	vector<vector2> v2Grid = grid->GetGrid();
 
+    float angle = pPlayer->GetAngle();
     D2D1_POINT_2F center = pPlayer->GetCenter();
-    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Rotation(angle, center) * trans);
 
-	pPlayer->Draw(pPlayer->GetX1(), pPlayer->GetY1(),
-		pPlayer->GetX2(), pPlayer->GetY2());
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Rotation(angle, center));
+
+    pPlayer->Draw(pPlayer->GetX1(), pPlayer->GetY1(),
+        pPlayer->GetX2(), pPlayer->GetY2());
 
     gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
 
 
     //==----
     // 4. Draw the Klingon Bird of Pray
+
+    center = pEnemy->GetCenter();
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Rotation(enemyAngle, center));
+
 	pEnemy->Draw(pEnemy->GetX1(), pEnemy->GetY1(),
 		pEnemy->GetX2(), pEnemy->GetY2());
+
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
 }
 
 /**

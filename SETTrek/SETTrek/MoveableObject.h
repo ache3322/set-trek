@@ -27,6 +27,8 @@ private:
 
 	float speedX;				//!< The moving speed - in x-direction
 	float speedY;				//!< The moving speed - in y-direction
+    float constSpeed;           //!< The speed for calculating the optimal speed of X and Y
+    float angle;                //!< The angle of the moveableobject
 
 public:
 
@@ -39,14 +41,19 @@ public:
 
     //-Methods
     void CalculateSpeed(float deltaX, float deltaY);
+    void CalculateAngle(float opposite, float ajacent);
 
 	//-Accessors
 	float GetSpeedX(void) const;
 	float GetSpeedY(void) const;
+    float GetConstSpeed(void);
 	float GetCenterX(void);
 	float GetCenterY(void);
+    float GetAngle(void);
 
 	//-Mutators
 	void SetSpeedX(float x);
 	void SetSpeedY(float y);
+    void SetConstSpeed(float s);
+    void SetAngle(float a);
 };

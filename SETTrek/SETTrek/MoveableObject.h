@@ -43,6 +43,8 @@ public:
 	//-Accessors
 	float GetSpeedX(void) const;
 	float GetSpeedY(void) const;
+	float GetCenterX(void);
+	float GetCenterY(void);
 
 	//-Mutators
 	void SetSpeedX(float x);

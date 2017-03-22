@@ -82,6 +82,14 @@ float MoveableObject::GetSpeedX(void) const {
 float MoveableObject::GetSpeedY(void) const {
 	return speedY;
 }
+float MoveableObject::GetCenterX(void) 
+{
+	return (GameObject::GetX1() + GameObject::GetX2()) / 2;
+}
+float MoveableObject::GetCenterY(void) 
+{
+	return (GameObject::GetY1() + GameObject::GetY2()) / 2;
+}
 
 void MoveableObject::SetSpeedX(float x) {
 	speedX = x;

@@ -12,6 +12,8 @@ float angle = 0.0f;
 float mouseXEnd = 0.0f;
 float mouseYEnd = 0.0f;
 
+bool isPlayerMoving = false;
+
 float overallX = 0.0f;
 float overallY = 0.0f;
 float distance = 0.0f;
@@ -44,7 +46,7 @@ void Level2::Load(D2D1_RECT_F size)
 	pPlanet3 = new GameObject(gfx, screenSize);
 	unique_ptr<GameObject> starShipBase(new GameObject(gfx, screenSize));
 	unique_ptr<GameObject> starShipDetail(new GameObject(gfx, screenSize));
-    pEnemy = new MoveableObject(0, 0, gfx, screenSize);
+    pEnemy = new MoveableObject(1.0f, 1.0f, gfx, screenSize);
 
 	pBackground->Init(L".\\assets\\SectorBackground.bmp");
 	pPlanet1->Init(L".\\assets\\Planet1.bmp");
@@ -64,19 +66,16 @@ void Level2::Load(D2D1_RECT_F size)
 	pPlanet1->SetBmp(
 		EffectManager::ConvertToBitmap(chromaKey.Get(), pPlanet1->GetBmpPixelSize())
 	);
-	chromaKey.Get()->Release();
 
 	chromaKey = EffectManager::CreateChroma(pPlanet2->GetBmp());
 	pPlanet2->SetBmp(
 		EffectManager::ConvertToBitmap(chromaKey.Get(), pPlanet2->GetBmpPixelSize())
 	);
-	chromaKey.Get()->Release();
 
 	chromaKey = EffectManager::CreateChroma(pPlanet3->GetBmp());
 	pPlanet3->SetBmp(
 		EffectManager::ConvertToBitmap(chromaKey.Get(), pPlanet3->GetBmpPixelSize())
 	);
-    chromaKey.Get()->Release();
     
     // Loading the effect for the enemy ship
     chromaKey = EffectManager::CreateChroma(pEnemy->GetBmp(), 0.0f, 0.0f, 1.0f, 0.15f);
@@ -129,6 +128,13 @@ void Level2::Load(D2D1_RECT_F size)
 
     mouseXEnd = pPlayer->GetX1();
     mouseYEnd = pPlayer->GetY1();
+
+	//--------------------
+	//-- Set the initial position of the Enemy Ship
+	pEnemy->SetX1(v2Grid[kCenterGrid].x);
+	pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
+	pEnemy->SetY1(v2Grid[kCenterGrid].y);
+	pEnemy->SetY2(v2Grid[kCenterGrid].y + grid->GetHeight());
 }
 
 
@@ -153,9 +159,10 @@ void Level2::Unload(void)
 
 
 /**
-* \brief
-* \param x - int -
-* \param y - int - 
+* \brief Process the player's input.
+* \details The input can be as simple as a mouse click event.
+* \param x - int - The mouse X position
+* \param y - int - The mouse Y position
 */
 void Level2::Process(int x, int y)
 {
@@ -172,6 +179,8 @@ void Level2::Process(int x, int y)
 
     // Calculate the angle
     angle = atan2f(deltaY, deltaX) * 180.f / PI;
+
+	isPlayerMoving = true;
 }
 
 
@@ -194,9 +203,43 @@ void Level2::Update(void)
 		GenerateRandomPlanet();
 	}
 
-    float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
-    float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
+	float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
+	float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
 
+	if (isPlayerMoving)
+	{
+		if (centerX > pEnemy->GetCenterX() + kXThreshold)
+		{
+			pEnemy->SetX1(pEnemy->GetX1() + pEnemy->GetSpeedX());
+			pEnemy->SetX2(pEnemy->GetX2() + pEnemy->GetSpeedX());
+		}
+		if (centerX < pEnemy->GetCenterX() - kXThreshold)
+		{
+			pEnemy->SetX1(pEnemy->GetX1() - pEnemy->GetSpeedX());
+			pEnemy->SetX2(pEnemy->GetX2() - pEnemy->GetSpeedX());
+		}
+		if (centerY > pEnemy->GetCenterY() + kYThreshold)
+		{
+			pEnemy->SetY1(pEnemy->GetY1() + pEnemy->GetSpeedY());
+			pEnemy->SetY2(pEnemy->GetY2() + pEnemy->GetSpeedY());
+		}
+		if (centerY < pEnemy->GetCenterY() - kYThreshold)
+		{
+			pEnemy->SetY1(pEnemy->GetY1() - pEnemy->GetSpeedY());
+			pEnemy->SetY2(pEnemy->GetY2() - pEnemy->GetSpeedY());
+		}
+	}
+
+	if (pEnemy->GetX2() < 0)
+	{
+		vector<vector2> v2Grid = grid->GetGrid();
+		pEnemy->SetX1(v2Grid[kCenterGrid].x);
+		pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
+	}
+
+	//===--------
+	// Player Ship Movement
+	//
     // Moving the StarShip X-Axis logic
     if (mouseXEnd > centerX + kXThreshold)
     {
@@ -224,7 +267,15 @@ void Level2::Update(void)
         pPlayer->SetY2(pPlayer->GetY2() + pPlayer->GetSpeedY());
     }
 
+	if ( (mouseXEnd < centerX + kXThreshold) && (mouseXEnd > centerX - kXThreshold) )
+	{
+		isPlayerMoving = false;
+	}
+
     trans = D2D1::Matrix3x2F::Translation(0, 0);
+	//
+	//===--------
+
 
     //===--------
     // Prevent Starship from going off the left-side of screen
@@ -283,6 +334,8 @@ void Level2::Render(void)
 
     //==----
     // 4. Draw the Klingon Bird of Pray
+	pEnemy->Draw(pEnemy->GetX1(), pEnemy->GetY1(),
+		pEnemy->GetX2(), pEnemy->GetY2());
 }
 
 /**

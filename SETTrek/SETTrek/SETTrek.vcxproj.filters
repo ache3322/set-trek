@@ -60,6 +60,9 @@
     <ClCompile Include="MoveableObject.cpp">
       <Filter>Source Files\GameObj Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Source Files\GameObj Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -90,6 +93,9 @@
       <Filter>Header Files\GameObj Headers</Filter>
     </ClInclude>
     <ClInclude Include="MoveableObject.h">
+      <Filter>Header Files\GameObj Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
       <Filter>Header Files\GameObj Headers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,6 +8,7 @@
 #pragma once
 #include <Wincodec.h>
 #include "Graphics.h"
+#include "Object.h"
 #include "SpriteSheet.h"
 
 
@@ -19,7 +20,7 @@
 *	system that allows for the object to be renderable and movable. As well,
 *	a bitmap resource to hold the graphics.
 */
-class GameObject
+class GameObject : public Object
 {
 private:
 
@@ -28,26 +29,28 @@ private:
 	float x2;				//!< The ending x-position (right)
 	float y2;				//!< The ending y-position (bottom)
 
-	D2D1_RECT_F renderArea;	//!< The rectangle area/size of where the object will be drawn
-	ID2D1Bitmap* bitmap;	//!< Holds the loaded Bitmap file
-	Graphics* gfx;			//!< Reference to the Graphics object
-
+    ID2D1Bitmap1* bitmap;   //!< Holds the loaded Bitmap file
 
 public:
 
 	//-Constructors
-	GameObject(Graphics* graphics, D2D1_RECT_F area);
+	GameObject();
 
 	//-Destructors
 	~GameObject();
 
-	void Init(LPCWSTR fileName);
+    //-Copy Constructors
+    GameObject(const GameObject& obj);
+
+    //-Init Resources
+	virtual void Init(LPCWSTR fileName);
+    virtual Graphics* GetGfx(void);
 
 	//-Draw Methods
 	void Draw(float left, float top, float right, float bottom);
 
 	//-Accessors
-	ID2D1Bitmap* GetBmp(void);
+	ID2D1Bitmap1* GetBmp(void);
 	D2D1_SIZE_U GetBmpPixelSize(void);
     D2D1_POINT_2F GetCenter(void);
 	virtual float GetX1(void);
@@ -56,9 +59,9 @@ public:
     virtual float GetY2(void);
 
 	//-Mutators
-	void SetBmp(ID2D1Bitmap* bmp);
-	void SetX1(float x);
-	void SetY1(float y);
-	void SetX2(float x);
-	void SetY2(float y);
+	void SetBmp(ID2D1Bitmap1* bmp);
+	virtual void SetX1(float x);
+	virtual void SetY1(float y);
+	virtual void SetX2(float x);
+	virtual void SetY2(float y);
 };

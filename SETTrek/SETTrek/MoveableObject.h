@@ -8,6 +8,7 @@
 #pragma once
 #include <Wincodec.h>
 #include "Graphics.h"
+#include "Object.h"
 #include "GameObject.h"
 
 
@@ -15,6 +16,7 @@
 // CONSTANTS
 //===================
 #define kConstSpeed     2.0f
+#define kDefaultHealth  20000.0f
 
 
 /**
@@ -30,14 +32,21 @@ private:
     float baseSpeed;            //!< The base speed of the object
     float angle;                //!< The angle of the moveableobject
 
+    float health;               //!< The health of the object
+
 public:
 
 	//-Constructors
-	MoveableObject(Graphics* graphics, D2D1_RECT_F area);
-	MoveableObject(float x, float y, Graphics* graphics, D2D1_RECT_F area);
+	MoveableObject();
+	MoveableObject(float x, float y);
+    MoveableObject(float xSpeed, float ySpeed, float baseSpeed);
 
 	//-Destructor
 	~MoveableObject(void);
+
+    //-Init Resources
+    virtual void Init(LPCWSTR fileName);
+    virtual Graphics* GetGfx(void);
 
     //-Methods
     void CalculateSpeed(float deltaX, float deltaY);
@@ -51,10 +60,12 @@ public:
 	float GetCenterX(void);
 	float GetCenterY(void);
     float GetAngle(void);
+    float GetHealth(void);
 
 	//-Mutators
 	void SetSpeedX(float x);
 	void SetSpeedY(float y);
     void SetBaseSpeed(float s);
     void SetAngle(float a);
+    void SetHealth(float h);
 };

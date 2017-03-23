@@ -20,7 +20,7 @@
 * \param area - D2D1_RECT_F - The dimensions of the screen
 * \return None
 */
-GameObject::GameObject(Graphics* graphics, D2D1_RECT_F area)
+GameObject::GameObject()
 {
 	x1 = 0;
 	y1 = 0;
@@ -28,10 +28,6 @@ GameObject::GameObject(Graphics* graphics, D2D1_RECT_F area)
 	y2 = 0;
 
 	bitmap = NULL;
-	// Set reference to the Graphics object
-	gfx = graphics;
-	// Set the area to render the GameObject
-	renderArea = area;
 }
 
 
@@ -49,10 +45,42 @@ GameObject::GameObject(Graphics* graphics, D2D1_RECT_F area)
 */
 GameObject::~GameObject()
 {
-	if (bitmap) bitmap->Release();
+    if (bitmap)
+    {
+        bitmap->Release();
+        bitmap = nullptr;
+    }
 }
 
 
+
+//---------------------------------
+//=======================
+// COPY CONSTRUCTOR
+//=======================
+GameObject::GameObject(const GameObject& obj)
+{
+    if (this == &obj)
+    {
+    }
+    else
+    {
+        this->renderArea = obj.renderArea;
+        this->gfx = obj.gfx;
+        this->bitmap = obj.bitmap;
+        this->SetX1(obj.x1);
+        this->SetX2(obj.x2);
+        this->SetY1(obj.y1);
+        this->SetY2(obj.y2);
+    }
+}
+
+
+
+//---------------------------------
+//========================
+// DIRECTX GRAPHICS STUFF
+//========================
 /**
 * \brief Initialization of the game object.
 * \details The initialization process will load bitmap resources from file.
@@ -64,6 +92,17 @@ void GameObject::Init(LPCWSTR fileName)
 	// Initialization of the asset - getting resources from file
 	// The bitmap asset will be loaded to a temporary bitmap
 	SpriteSheet sprite(fileName, gfx, &bitmap);
+}
+
+
+/**
+* \brief Get the static reference to the Graphics.
+* \param None
+* \return Graphics* : The graphics.
+*/
+Graphics* GameObject::GetGfx(void)
+{
+    return gfx;
 }
 
 
@@ -106,7 +145,7 @@ void GameObject::Draw(float left, float top, float right, float bottom)
 * \param void
 * \return ID2D1Bitmap* : The bitmap of this object.
 */
-ID2D1Bitmap* GameObject::GetBmp(void)
+ID2D1Bitmap1* GameObject::GetBmp(void)
 {
 	return bitmap;
 }
@@ -163,7 +202,7 @@ float GameObject::GetY2(void) {
 * \param bmp - ID2D1Bitmap* - The new bitmap
 * \return void
 */
-void GameObject::SetBmp(ID2D1Bitmap* bmp)
+void GameObject::SetBmp(ID2D1Bitmap1* bmp)
 {
 	if (bitmap)
 	{

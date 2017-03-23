@@ -6,6 +6,8 @@
 * DESCRIPTION	: The header file containing an abstract definition of the Level interface.
 */
 #pragma once
+#include <vector>
+#include <memory>
 #include "Graphics.h"
 
 

@@ -82,7 +82,7 @@ void Grid::GenerateRandCoord(void)
 	// that a planet will spawn...
 	for (int i = 0; i < grid.size(); ++i)
 	{
-		isSpawn = (rand() % 100) < 5;
+		isSpawn = (rand() % 100) < kPlanetSpawnChance;
 
 		if (isSpawn)
 		{

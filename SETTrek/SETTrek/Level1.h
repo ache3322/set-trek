@@ -9,14 +9,11 @@
 #include "Level.h"
 #include "EffectManager.h"
 #include "GameObject.h"
-#include <time.h>
-#include <vector>
-#include <memory>
+#include "Grid.h"
 using namespace std;
 
 
 //-CONSTANTS
-#define kNumberOfGrid		10
 #define kCenterGrid			49
 #define kGridSquares		100
 

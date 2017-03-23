@@ -16,8 +16,12 @@ using namespace std;
 //===================
 // CONSTANTS
 //===================
-#define kNumberOfGrid		15
+#define kNumberOfGrid		10
 #define kCenterGrid			49
+#define kWindowPadding      1.0f
+
+#define kPlanetPadding      5.0f
+#define kPlanetSpawnChance  2
 
 
 //=============================

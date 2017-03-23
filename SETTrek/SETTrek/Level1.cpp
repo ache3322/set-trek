@@ -29,13 +29,13 @@ void Level1::Load(D2D1_RECT_F size)
 	gridHeight = windowHeight / kNumberOfGrid;
 
 	// Loading the assets, resources, images, etc.
-	pBackground = new GameObject(gfx, screenSize);
-	pStarShip = new GameObject(gfx, screenSize);
-	pPlanet1 = new GameObject(gfx, screenSize);
-	pPlanet2 = new GameObject(gfx, screenSize);
-	pPlanet3 = new GameObject(gfx, screenSize);
-	unique_ptr<GameObject> starShipBase(new GameObject(gfx, screenSize));
-	unique_ptr<GameObject> starShipDetail(new GameObject(gfx, screenSize));
+	pBackground = new GameObject();
+	pStarShip = new GameObject();
+	pPlanet1 = new GameObject();
+	pPlanet2 = new GameObject();
+	pPlanet3 = new GameObject();
+	unique_ptr<GameObject> starShipBase(new GameObject());
+	unique_ptr<GameObject> starShipDetail(new GameObject());
 
 	pBackground->Init(L".\\assets\\SectorBackground.bmp");
 	pStarShip->Init(L".\\assets\\ShipBase.bmp");

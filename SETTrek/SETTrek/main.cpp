@@ -10,6 +10,7 @@
 #include "Graphics.h"
 #include "GameManager.h"
 #include "EffectManager.h"
+#include "Object.h"
 #include "Level.h"
 #include "Level1.h"
 #include "Level2.h"
@@ -95,19 +96,25 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 	Level::Init(graphics);
 	EffectManager::Init(graphics);
 
+    // Initailize the generic Object
+    Object::Initialize(graphics, D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
+
 	// Initialize the GameManager
 	GameManager::Init();
 	// Load the initial level
 	GameManager::LoadLevel(new Level2(), D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
 
+
 	// Now show/display the window
 	ShowWindow(windowHandle, nCmdShow);
 
 
-    //==---
+    //===------------
+    //
 	/* GAMP LOOP */
-    //==---
-	MSG msg = { 0 };
+    //
+    //===------------
+    MSG msg = { 0 };
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))

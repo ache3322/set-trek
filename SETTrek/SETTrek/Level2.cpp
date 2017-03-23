@@ -35,13 +35,13 @@ void Level2::Load(D2D1_RECT_F size)
 	grid = new Grid(windowWidth, windowHeight);
 
 	// Loading the assets, resources, images, etc.
-	pBackground = new GameObject(gfx, screenSize);
-	pPlanet1 = new GameObject(gfx, screenSize);
-	pPlanet2 = new GameObject(gfx, screenSize);
-	pPlanet3 = new GameObject(gfx, screenSize);
-	unique_ptr<GameObject> starShipBase(new GameObject(gfx, screenSize));
-	unique_ptr<GameObject> starShipDetail(new GameObject(gfx, screenSize));
-    pEnemy = new MoveableObject(1.f, 1.f, gfx, screenSize);
+	pBackground = new GameObject();
+	pPlanet1 = new GameObject();
+	pPlanet2 = new GameObject();
+	pPlanet3 = new GameObject();
+	unique_ptr<GameObject> starShipBase(new GameObject());
+	unique_ptr<GameObject> starShipDetail(new GameObject());
+    pEnemy = new MoveableObject(1.0f, 1.0f, 1.5f);
 
 	pBackground->Init(L".\\assets\\SectorBackground.bmp");
 	pPlanet1->Init(L".\\assets\\Planet1.bmp");
@@ -66,7 +66,7 @@ void Level2::Load(D2D1_RECT_F size)
 	pPlanet2->SetBmp(
 		EffectManager::ConvertToBitmap(chromaKey.Get(), pPlanet2->GetBmpPixelSize())
 	);
-
+    
 	chromaKey = EffectManager::CreateChroma(pPlanet3->GetBmp());
 	pPlanet3->SetBmp(
 		EffectManager::ConvertToBitmap(chromaKey.Get(), pPlanet3->GetBmpPixelSize())
@@ -82,7 +82,7 @@ void Level2::Load(D2D1_RECT_F size)
 	ComPtr<ID2D1Effect> shipBaseEffect;
 	ComPtr<ID2D1Effect> shipDetailEffect;
 
-	shipBaseEffect = EffectManager::CreateChroma(starShipBase->GetBmp(), 0.25f, 0);
+	shipBaseEffect = EffectManager::CreateChroma(starShipBase->GetBmp(), 0.1f, 1);
 	starShipBase->SetBmp(
 		EffectManager::ConvertToBitmap(shipBaseEffect.Get(), starShipBase->GetBmpPixelSize())
 	);
@@ -99,7 +99,7 @@ void Level2::Load(D2D1_RECT_F size)
 	compositeKey = EffectManager::CreateComposite(starShipBase->GetBmp(), starShipDetail->GetBmp());
 
 	// DEBUG/TEST
-	pPlayer = new MoveableObject(0, 0, gfx, screenSize);
+	pPlayer = new MoveableObject(0, 0, 2.0f);
 	pPlayer->Init(L".\\assets\\ShipBase.bmp");
 	pPlayer->SetBmp(EffectManager::ConvertToBitmap(compositeKey.Get(), pPlayer->GetBmpPixelSize()));
 	// DEBUG/TEST
@@ -111,6 +111,7 @@ void Level2::Load(D2D1_RECT_F size)
 	grid->ConstructGrid();
 	grid->GenerateRandCoord();
 	GenerateRandomPlanet();
+    reGeneratePlanets = false;
 
 
     //--------------------
@@ -128,10 +129,14 @@ void Level2::Load(D2D1_RECT_F size)
 
 	//--------------------
 	//-- Set the initial position of the Enemy Ship
-	pEnemy->SetX1(v2Grid[kCenterGrid].x);
-	pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
-	pEnemy->SetY1(v2Grid[kCenterGrid].y);
-	pEnemy->SetY2(v2Grid[kCenterGrid].y + grid->GetHeight());
+	//pEnemy->SetX1(v2Grid[kCenterGrid].x);
+	//pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
+	//pEnemy->SetY1(v2Grid[kCenterGrid].y);
+	//pEnemy->SetY2(v2Grid[kCenterGrid].y + grid->GetHeight());
+    pEnemy->SetX1(0);
+    pEnemy->SetX2(grid->GetWidth());
+    pEnemy->SetY1(0);
+    pEnemy->SetY2(grid->GetHeight());
 }
 
 
@@ -143,7 +148,6 @@ void Level2::Load(D2D1_RECT_F size)
 void Level2::Unload(void)
 {
 	// Clean up any resources
-	chosenPlanets.clear();
 	if (grid) delete grid;
 	if (pBackground) delete pBackground;
 	if (pPlanet1) delete pPlanet1;
@@ -172,6 +176,7 @@ void Level2::Process(int x, int y)
 
     float deltaX = mouseXEnd - centerX;
     float deltaY = mouseYEnd - centerY;
+    // Calculate the expected speed
     pPlayer->CalculateSpeed(deltaX, deltaY);
 
     // Calculate the angle
@@ -188,67 +193,68 @@ void Level2::Process(int x, int y)
 */
 void Level2::Update(void)
 {
-    float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
-    float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
+    float centerX = pPlayer->GetCenterX();
+    float centerY = pPlayer->GetCenterY();
+    float enemyCenterX = pEnemy->GetCenterX();
+    float enemyCenterY = pEnemy->GetCenterY();
 
-    if (isPlayerMoving)
-    {
-		float enemyDeltaX = pPlayer->GetCenterX() - pEnemy->GetCenterX();
-		float enemyDeltaY = pPlayer->GetCenterY() - pEnemy->GetCenterY();
-		pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY);
 
-		// Calc double the grid width - if enemy approaches within 2 grid spaces of player
-		float doubleGridWidth = grid->GetWidth() * 2;
-		float doubleGridHeight = grid->GetHeight() * 2;
+    //===--------
+    // Enemy Movement
+    //
+  //  if (isPlayerMoving)
+  //  {
+  //      // Calc double the grid width - if enemy approaches within 2 grid spaces of player
+  //      float doubleGridWidth = grid->GetWidth() * 2;
+  //      float doubleGridHeight = grid->GetHeight() * 2;
 
-		if ( (centerX + doubleGridWidth > pEnemy->GetCenterX() && centerX - doubleGridWidth < pEnemy->GetCenterX())
-			&& (centerY + doubleGridHeight > pEnemy->GetCenterY() && centerY - doubleGridHeight < pEnemy->GetCenterY()) )
-		{
-			// Calculating 15% of the speed for X and Y
-			pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY, 0.15f);
+		//float enemyDeltaX = pPlayer->GetCenterX() - pEnemy->GetCenterX();
+		//float enemyDeltaY = pPlayer->GetCenterY() - pEnemy->GetCenterY();
 
-			string output = "Enemy speed : " + to_string(pEnemy->GetSpeedX()) + " | " + to_string(pEnemy->GetSpeedY()) + "\n";
-			OutputDebugStringA(output.c_str());
-		}
+		//pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY);
 
-        //===--------
-        // Enemy Movement
-        //
-        if (centerX > pEnemy->GetCenterX() )
-        {
-            pEnemy->SetX1(pEnemy->GetX1() + pEnemy->GetSpeedX());
-            pEnemy->SetX2(pEnemy->GetX2() + pEnemy->GetSpeedX());
-        }
-        if (centerX < pEnemy->GetCenterX() )
-        {
-            pEnemy->SetX1(pEnemy->GetX1() + pEnemy->GetSpeedX());
-            pEnemy->SetX2(pEnemy->GetX2() + pEnemy->GetSpeedX());
-        }
-        if (centerY > pEnemy->GetCenterY() )
-        {
-            pEnemy->SetY1(pEnemy->GetY1() + pEnemy->GetSpeedY());
-            pEnemy->SetY2(pEnemy->GetY2() + pEnemy->GetSpeedY());
-        }
-        if (centerY < pEnemy->GetCenterY() )
-        {
-            pEnemy->SetY1(pEnemy->GetY1() + pEnemy->GetSpeedY());
-            pEnemy->SetY2(pEnemy->GetY2() + pEnemy->GetSpeedY());
-        }
+  //      // Check the if Klingon ship is within 2 grid spaces of the Player ship...
+  //      // if the Klingon is in 2 grid spaces, then the speed is increased by 10%
+		//if ( (centerX + doubleGridWidth > pEnemy->GetCenterX() && centerX - doubleGridWidth < pEnemy->GetCenterX())
+		//	&& (centerY + doubleGridHeight > pEnemy->GetCenterY() && centerY - doubleGridHeight < pEnemy->GetCenterY()) )
+		//{
+		//	// Calculating 15% of the speed for X and Y
+		//	pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY, 0.10f);
 
-        if (pEnemy->GetX2() < 0)
-        {
-            vector<vector2> v2Grid = grid->GetGrid();
-            pEnemy->SetX1(v2Grid[kCenterGrid].x);
-            pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
-        }
-        enemyAngle = 180.f + (atan2f(enemyDeltaY, enemyDeltaX) * 180.f / PI);
-    }
-    //if (enemyAngle > 360.0f)
-    //{
-    //    enemyAngle = 0.0f;
-    //}
+		//	//string output = "Enemy speed : " + to_string(pEnemy->GetSpeedX()) + " | " + to_string(pEnemy->GetSpeedY()) + "\n";
+		//	//OutputDebugStringA(output.c_str());
+		//}
+
+  //      //===--------
+  //      // Enemy Movement
+  //      //
+  //      if ( (centerX < pEnemy->GetCenterX() && centerX > pEnemy->GetCenterX())
+  //          && (centerY > pEnemy->GetCenterY() && centerY < pEnemy->GetCenterY()) )
+  //      {
+  //          // Do nothing if Klingon ship reaches the Player ship
+  //      }
+  //      else
+  //      {
+  //          pEnemy->SetX1(pEnemy->GetX1() + pEnemy->GetSpeedX());
+  //          pEnemy->SetX2(pEnemy->GetX2() + pEnemy->GetSpeedX());
+  //          pEnemy->SetY1(pEnemy->GetY1() + pEnemy->GetSpeedY());
+  //          pEnemy->SetY2(pEnemy->GetY2() + pEnemy->GetSpeedY());
+  //      }
+
+  //      if (pEnemy->GetX2() < 0)
+  //      {
+  //          vector<vector2> v2Grid = grid->GetGrid();
+  //          pEnemy->SetX1(v2Grid[kCenterGrid].x);
+  //          pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
+  //      }
+
+  //      enemyAngle = 180.f + (atan2f(enemyDeltaY, enemyDeltaX) * 180.f / PI);
+  //      //
+  //      //===--------
+  //  }
     //
     //===--------
+
 
 	//===--------
 	// Player Ship Movement
@@ -275,37 +281,113 @@ void Level2::Update(void)
     //===--------
     // Starship Window Boundaries Check
     //
-    if (pPlayer->GetX1() < 0)
+    // BUG: If the Player ship is close to the window borders it must
+    //  appear at the opposite-side of the screen. However, since the game loop
+    //  is iterated very fast - the Player ship will 'bounce' back and forth. To
+    //  compensate for this - a padding is used to spawn the ship beyond the boundaries.
+    //
+    // CHECK the left-side of the screen
+    if (pPlayer->GetX1() < 0.0f - kWindowPadding)
     {
+        // The player appears on the right-side
+        pPlayer->SetX1(grid->GetWindowWidth() - grid->GetWidth() - kWindowPadding);
+        pPlayer->SetX2(grid->GetWindowWidth() - kWindowPadding);
+        mouseXEnd = pPlayer->GetCenterX();
+        mouseYEnd = pPlayer->GetCenterY();
+        reGeneratePlanets = true;
+
+    }
+    // CHECK the right-side of the screen
+    else if (pPlayer->GetX2() > grid->GetWindowWidth() )
+    {
+        // The player appears on the left-side
         pPlayer->SetX1(0);
         pPlayer->SetX2(0 + grid->GetWidth());
-    }
-    if (pPlayer->GetY1() < 0)
-    {
-        pPlayer->SetY1(grid->GetWindowHeight() - grid->GetHeight());
-        pPlayer->SetY2(grid->GetWindowHeight());
+        mouseXEnd = pPlayer->GetCenterX();
+        mouseYEnd = pPlayer->GetCenterY();
+        reGeneratePlanets = true;
     }
 
-    // CHECK if right-side of Player leaves right screen
-    if (pPlayer->GetX2() > grid->GetWindowWidth() - 5.0f)
+    // CHECK the top-side of the screen
+    if (pPlayer->GetY1() < 0.0f)
     {
-        pPlayer->SetX1(0);
-        pPlayer->SetX2(0 + grid->GetWidth());
-        // Generate another random set of coordinates for the planets
-        grid->GenerateRandCoord();
-        GenerateRandomPlanet();
+        // The player appears on the bottom-side
+        pPlayer->SetY1(grid->GetWindowHeight() - grid->GetHeight() - kWindowPadding);
+        pPlayer->SetY2(grid->GetWindowHeight() - kWindowPadding);
+        mouseXEnd = pPlayer->GetCenterX();
+        mouseYEnd = pPlayer->GetCenterY();
+        reGeneratePlanets = true;
     }
-    if (pPlayer->GetY2() > grid->GetWindowHeight() - 5.0f)
+    // CHECK the bottom-side of the screen
+    else if (pPlayer->GetY2() > grid->GetWindowHeight() )
     {
-        pPlayer->SetY1(0);
-        pPlayer->SetY2(grid->GetHeight());
-        // Generate another random set of coordinates for the planets
-        grid->GenerateRandCoord();
-        GenerateRandomPlanet();
+        // The player appears on the top-side
+        pPlayer->SetY1(0 + kWindowPadding);
+        pPlayer->SetY2(grid->GetHeight() + kWindowPadding);
+        mouseXEnd = pPlayer->GetCenterX();
+        mouseYEnd = pPlayer->GetCenterY();
+        reGeneratePlanets = true;
     }
 
+    if (reGeneratePlanets)
+    {
+        grid->GenerateRandCoord();
+        GenerateRandomPlanet();
+        reGeneratePlanets = false;
+    }
     //
     //===--------
+
+    //===--------
+    // Planet Collision Detection
+    //
+    // NOTE: Collision Detection should happen before moving the Player
+    for (int i = 0; i < grid->GetRandCoordSize(); ++i)
+    {
+        D2D1_POINT_2F planetCenter = chosenPlanets[i]->GetCenter();
+        float planetCenterX = planetCenter.x;
+        float planetCenterY = planetCenter.y;
+        float halfGridWidth = (grid->GetWidth() * 0.5f) - kPlanetPadding;
+        float halfGridHeight = (grid->GetHeight() * 0.5f) - kPlanetPadding;
+
+        // Iterate through each Planet coordinates to determine
+        // if the Player has collided with a certain point...
+        if ( (pPlayer->GetCenterX() < planetCenterX + halfGridWidth && pPlayer->GetCenterX() > planetCenterX - halfGridWidth)
+            && (pPlayer->GetCenterY() < planetCenterY + halfGridHeight && pPlayer->GetCenterY() > planetCenterY - halfGridHeight) )
+        {
+            string output = "Colliding with planet!!! " + to_string(planetCenterX) + "\n";
+            OutputDebugStringA(output.c_str());
+
+            pPlayer->SetSpeedX(0.0f);
+            pPlayer->SetSpeedY(0.0f);
+            mouseXEnd = pPlayer->GetCenterX();
+            mouseYEnd = pPlayer->GetCenterY();
+        }
+    }
+    //
+    //===--------
+
+    //===--------
+    // Enemy Collision Detection
+    //
+    float enemyBoundaryX = (enemyCenterX) * 0.9f;
+    float enemyBoundaryY = (enemyCenterY) * 0.9f;
+    if ( (pPlayer->GetCenterX() < enemyCenterX + enemyBoundaryX) && (pPlayer->GetCenterX() > enemyCenterX - enemyBoundaryX) 
+        && (pPlayer->GetCenterY() < enemyCenterY + enemyBoundaryY) && (pPlayer->GetCenterX() > enemyCenterY - enemyBoundaryY) )
+    {
+        //string output = "Center of Player ( " + to_string(centerX) + ", " + to_string(centerY) + ")\n";
+        pPlayer->SetHealth(pPlayer->GetHealth() - 300);
+    }
+    else
+    {
+        string output = "No collision with Klingon\n";
+        OutputDebugStringA(output.c_str());
+    }
+    //
+    //===--------
+
+    string output = "Player health ( " + to_string(pPlayer->GetHealth()) + " )\n";
+    OutputDebugStringA(output.c_str());
 }
 
 
@@ -336,6 +418,7 @@ void Level2::Render(void)
 
     //==----
 	// 3. Draw the Starship
+    //
 	vector<vector2> v2Grid = grid->GetGrid();
 
     float angle = pPlayer->GetAngle();
@@ -351,7 +434,7 @@ void Level2::Render(void)
 
     //==----
     // 4. Draw the Klingon Bird of Pray
-
+    //
     center = pEnemy->GetCenter();
     gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Rotation(enemyAngle, center));
 
@@ -369,6 +452,7 @@ void Level2::Render(void)
 void Level2::GenerateRandomPlanet(void)
 {
 	int randomChance = 0;
+    GameObject* tmpPlanet = nullptr;
 
 	chosenPlanets.clear();
 
@@ -377,15 +461,32 @@ void Level2::GenerateRandomPlanet(void)
 	// could be Earth, Mars, or Jupiter
 	for (int i = 0; i < grid->GetRandCoordSize(); ++i)
 	{
+        float left = grid->GetRandCoord()[i].x;
+        float right = grid->GetRandCoord()[i].x + grid->GetWidth();
+        float top = grid->GetRandCoord()[i].y;
+        float bottom = grid->GetRandCoord()[i].y + grid->GetHeight();
+
 		randomChance = rand() % 3;
 		if (randomChance == 0) {
-			chosenPlanets.push_back(pPlanet1);
+            tmpPlanet = new GameObject();
+            tmpPlanet->SetBmp(pPlanet1->GetBmp());
+			chosenPlanets.push_back(tmpPlanet);
 		}
 		else if (randomChance == 1) {
-			chosenPlanets.push_back(pPlanet2);
+            tmpPlanet = new GameObject();
+            tmpPlanet->SetBmp(pPlanet2->GetBmp());
+			chosenPlanets.push_back(tmpPlanet);
 		}
 		else if (randomChance == 2) {
-			chosenPlanets.push_back(pPlanet3);
+            tmpPlanet = new GameObject();
+            tmpPlanet->SetBmp(pPlanet3->GetBmp());
+			chosenPlanets.push_back(tmpPlanet);
 		}
+
+        // Set the coordinates for the planet
+        chosenPlanets[i]->SetX1(left);
+        chosenPlanets[i]->SetX2(right);
+        chosenPlanets[i]->SetY1(top);
+        chosenPlanets[i]->SetY2(bottom);
 	}
 }

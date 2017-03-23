@@ -10,8 +10,6 @@
 */
 #pragma once
 #include <string>
-#include <vector>
-#include <memory>
 #include "Level.h"
 #include "EffectManager.h"
 #include "GameObject.h"
@@ -50,6 +48,7 @@ private:
 
 	Grid* grid;
 	vector<GameObject *> chosenPlanets;			//!< Contains the planets (a random chance) that will be spawned
+    bool reGeneratePlanets;                      //!< A boolean flag to re-generate the planets again and again
 
 public:
 

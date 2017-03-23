@@ -188,40 +188,51 @@ void Level2::Process(int x, int y)
 */
 void Level2::Update(void)
 {
-
     float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
     float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
-    float enemyDeltaX = pPlayer->GetCenterX() - pEnemy->GetCenterX();
-    float enemyDeltaY = pPlayer->GetCenterY() - pEnemy->GetCenterY();
-    pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY);
-
-    // The start ship moves grid to grid
-    //pStarShip->SetX1(pStarShip->GetX1() + grid->GetWidth());
 
     if (isPlayerMoving)
     {
+		float enemyDeltaX = pPlayer->GetCenterX() - pEnemy->GetCenterX();
+		float enemyDeltaY = pPlayer->GetCenterY() - pEnemy->GetCenterY();
+		pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY);
+
+		// Calc double the grid width - if enemy approaches within 2 grid spaces of player
+		float doubleGridWidth = grid->GetWidth() * 2;
+		float doubleGridHeight = grid->GetHeight() * 2;
+
+		if ( (centerX + doubleGridWidth > pEnemy->GetCenterX() && centerX - doubleGridWidth < pEnemy->GetCenterX())
+			&& (centerY + doubleGridHeight > pEnemy->GetCenterY() && centerY - doubleGridHeight < pEnemy->GetCenterY()) )
+		{
+			// Calculating 15% of the speed for X and Y
+			pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY, 0.15f);
+
+			string output = "Enemy speed : " + to_string(pEnemy->GetSpeedX()) + " | " + to_string(pEnemy->GetSpeedY()) + "\n";
+			OutputDebugStringA(output.c_str());
+		}
+
         //===--------
         // Enemy Movement
         //
-        if (centerX > pEnemy->GetCenterX() + kXThreshold)
+        if (centerX > pEnemy->GetCenterX() )
         {
             pEnemy->SetX1(pEnemy->GetX1() + pEnemy->GetSpeedX());
             pEnemy->SetX2(pEnemy->GetX2() + pEnemy->GetSpeedX());
         }
-        if (centerX < pEnemy->GetCenterX() - kXThreshold)
+        if (centerX < pEnemy->GetCenterX() )
         {
-            pEnemy->SetX1(pEnemy->GetX1() - pEnemy->GetSpeedX());
-            pEnemy->SetX2(pEnemy->GetX2() - pEnemy->GetSpeedX());
+            pEnemy->SetX1(pEnemy->GetX1() + pEnemy->GetSpeedX());
+            pEnemy->SetX2(pEnemy->GetX2() + pEnemy->GetSpeedX());
         }
-        if (centerY > pEnemy->GetCenterY() + kYThreshold)
+        if (centerY > pEnemy->GetCenterY() )
         {
             pEnemy->SetY1(pEnemy->GetY1() + pEnemy->GetSpeedY());
             pEnemy->SetY2(pEnemy->GetY2() + pEnemy->GetSpeedY());
         }
-        if (centerY < pEnemy->GetCenterY() - kYThreshold)
+        if (centerY < pEnemy->GetCenterY() )
         {
-            pEnemy->SetY1(pEnemy->GetY1() - pEnemy->GetSpeedY());
-            pEnemy->SetY2(pEnemy->GetY2() - pEnemy->GetSpeedY());
+            pEnemy->SetY1(pEnemy->GetY1() + pEnemy->GetSpeedY());
+            pEnemy->SetY2(pEnemy->GetY2() + pEnemy->GetSpeedY());
         }
 
         if (pEnemy->GetX2() < 0)
@@ -231,9 +242,6 @@ void Level2::Update(void)
             pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
         }
         enemyAngle = 180.f + (atan2f(enemyDeltaY, enemyDeltaX) * 180.f / PI);
-
-        string output = "Enemy angle : " + to_string(enemyAngle) + "\n";
-        OutputDebugStringA(output.c_str());
     }
     //if (enemyAngle > 360.0f)
     //{

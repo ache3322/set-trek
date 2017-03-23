@@ -60,6 +60,13 @@ MoveableObject::~MoveableObject()
 //=======================
 // CALCULATIONS
 //=======================
+/**
+* \brief Calculates the optimal speed path.
+* \details Uses the calculation to retrieve the hypotenuse.
+* \param deltaX - float - The difference in the x2 and x1
+* \param deltaY - float - The difference in the y2 and y1
+* \return None
+*/
 void MoveableObject::CalculateSpeed(float deltaX, float deltaY)
 {
     // distance = sqr (deltaX^2 + deltaY^2);
@@ -74,6 +81,26 @@ void MoveableObject::CalculateSpeed(float deltaX, float deltaY)
         SetSpeedX(overallX);
         SetSpeedY(overallY);
     }
+}
+
+
+void MoveableObject::CalculateSpeed(float deltaX, float deltaY, float percent)
+{
+	// distance = sqr (deltaX^2 + deltaY^2);
+	float distance = sqrtf(deltaX * deltaX + deltaY * deltaY);
+	float newSpeedX = 0.0f;
+	float newSpeedY = 0.0f;
+	if (distance != 0)
+	{
+		newSpeedX = deltaX * kConstSpeed / distance;
+		newSpeedY = deltaY * kConstSpeed / distance;
+
+		newSpeedX = newSpeedX + (newSpeedX * percent);
+		newSpeedY = newSpeedY + (newSpeedY * percent);
+
+		SetSpeedX(newSpeedX);
+		SetSpeedY(newSpeedY);
+	}
 }
 
 

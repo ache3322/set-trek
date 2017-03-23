@@ -34,7 +34,7 @@ void EffectManager::Init(Graphics* graphics)
 * \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
 * \return ID2D1Effect* : The chroma key effect.
 */
-ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1)
+ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap1* bmp1)
 {
 	ID2D1Effect* chroma = NULL;
 
@@ -61,11 +61,11 @@ ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1)
 *	will look for a specified color and will "remove" it. As well, this
 *	method takes in a tolerance. By default, the "green" is removed.
 * \param gfx - Graphics* - A reference to the Graphics object
-* \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
+* \param bmp1 - ID2D1Bitmap1* - The effects being applied to the bitmap
 * \param tolerance - float - 
 * \return ID2D1Effect* : The chroma key effect.
 */
-ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, float tolerance)
+ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap1* bmp1, float tolerance)
 {
 	ID2D1Effect* chroma = NULL;
 
@@ -92,12 +92,12 @@ ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, float tolerance)
 *	will look for a specified color and will "remove" it. As well, this
 *	method takes in a tolerance. By default, the "green" is removed.
 * \param gfx - Graphics* - A reference to the Graphics object
-* \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
+* \param bmp1 - ID2D1Bitmap1* - The effects being applied to the bitmap
 * \param tolerance - float -
 * \param isFeather - int - Whether feathering effect is applied to the bitmap
 * \return ID2D1Effect* : The chroma key effect.
 */
-ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, float tolerance, int isFeather)
+ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap1* bmp1, float tolerance, int isFeather)
 {
 	ID2D1Effect* chroma = NULL;
 
@@ -124,12 +124,12 @@ ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, float tolerance, int
 *	will look for a specified color and will "remove" it. As well, this
 *	method takes in a tolerance. A vector3 is also passsed in for the color.
 * \param gfx - Graphics* - A reference to the Graphics object
-* \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
+* \param bmp1 - ID2D1Bitmap1* - The effects being applied to the bitmap
 * \param color - D2D1_VECTOR_3F -
 * \param tolerance - float -
 * \return ID2D1Effect* : The chroma key effect.
 */
-ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, D2D1_VECTOR_3F color, float tolerance)
+ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap1* bmp1, D2D1_VECTOR_3F color, float tolerance)
 {
 	ID2D1Effect* chroma = NULL;
 
@@ -155,14 +155,14 @@ ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, D2D1_VECTOR_3F color
 *	be passed in to create the effect out of it. The chroma effect
 *	will look for a specified color and will "remove" it.
 * \param gfx - Graphics* - A reference to the Graphics object
-* \param bmp1 - ID2D1Bitmap* - The effects being applied to the bitmap
+* \param bmp1 - ID2D1Bitmap1* - The effects being applied to the bitmap
 * \param r - float
 * \param g - float
 * \param b - float
 * \param tolerance - float -
 * \return ID2D1Effect* : The chroma key effect.
 */
-ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, float r, float g, float b, float tolerance)
+ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap1* bmp1, float r, float g, float b, float tolerance)
 {
 	ID2D1Effect* chroma = NULL;
 
@@ -187,10 +187,10 @@ ID2D1Effect* EffectManager::CreateChroma(ID2D1Bitmap* bmp1, float r, float g, fl
 * \details The composite effect needs to bitmap sources. Both bitmaps will
 *	be composited over each other.
 * \param gfx - Graphics* - A reference to the Graphics object
-* \param bmp1 - ID2D1Bitmap* - A bitmap being composited
-* \param bmp2 - ID2D1Bitmap* - The second bitmap composited over the first bitmap
+* \param bmp1 - ID2D1Bitmap1* - A bitmap being composited
+* \param bmp2 - ID2D1Bitmap1* - The second bitmap composited over the first bitmap
 */
-ID2D1Effect* EffectManager::CreateComposite(ID2D1Bitmap* bmp1, ID2D1Bitmap* bmp2)
+ID2D1Effect* EffectManager::CreateComposite(ID2D1Bitmap1* bmp1, ID2D1Bitmap1* bmp2)
 {
 	ID2D1Effect* composite = NULL;
 

@@ -15,7 +15,7 @@
 * \param gfx - Graphics* - Creating render target area for drawing bitmap
 * \param[out] bmp - ID2D1Bitmap** - Where to save the bitmap resource
 */
-SpriteSheet::SpriteSheet(LPCWSTR filename, Graphics* gfx, ID2D1Bitmap** bmp)
+SpriteSheet::SpriteSheet(LPCWSTR filename, Graphics* gfx, ID2D1Bitmap1** bmp)
 {
 	IWICBitmapDecoder *pDecoder = NULL;
 	IWICBitmapFrameDecode *pSource = NULL;

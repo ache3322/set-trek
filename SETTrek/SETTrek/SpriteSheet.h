@@ -24,7 +24,7 @@ private:
 public:
 
 	/*-Constructor-*/
-	SpriteSheet(LPCWSTR filename, Graphics* gfx, ID2D1Bitmap** bmp);
+	SpriteSheet(LPCWSTR filename, Graphics* gfx, ID2D1Bitmap1** bmp);
 
 	/*-Destructor-*/
 	~SpriteSheet();

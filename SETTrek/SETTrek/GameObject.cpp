@@ -58,6 +58,13 @@ GameObject::~GameObject()
 //=======================
 // COPY CONSTRUCTOR
 //=======================
+/**
+* \brief Copy constructor for the object.
+* \details Will copy the data member values for an object
+*   to a new object.
+* \param obj - const GameObject& - The object being copied
+* \return None
+*/
 GameObject::GameObject(const GameObject& obj)
 {
     if (this == &obj)
@@ -134,6 +141,57 @@ void GameObject::Draw(float left, float top, float right, float bottom)
 }
 
 
+/**
+* \brief Draws the game object to the screen.
+* \details Draws the object with an opacity level
+* \param left - float - The left of the rectangle
+* \param top - float - The top of the rectangle
+* \param right - float - The right of the rectangle
+* \param bottom - float - The bottom of the rectangle
+* \param opacity - float - How transparent the object will be
+* \return void
+*/
+void GameObject::Draw(float left, float top, float right, float bottom, float opacity)
+{
+    D2D1_RECT_F destRect = D2D1::RectF(left, top, right, bottom);
+
+    gfx->GetDeviceContext()->DrawBitmap(
+        bitmap,
+        destRect,
+        opacity,
+        D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
+        renderArea);
+}
+
+
+/**
+* \brief Draws the game object to the screen.
+* \details An additional opacity parameter will adjust the transparency
+*   of the object.
+*
+*   This Draw method takes in two points instead of four points. The right and bottom
+*   boundaries are gotten from the bitmap size itself.
+*
+* \param left - float - The left of the rectangle
+* \param top - float - The top of the rectangle
+* \param opacity - float - How transparent the object will be
+* \see void GameObject::Draw(float left, float top, float right, float bottom)
+* \see void GameObject::Draw(float left, float top, float right, float bottom, float opacity)
+* \return void
+*/
+void GameObject::Draw(float left, float top, float opacity)
+{
+    D2D1_RECT_F destRect = D2D1::RectF(left, top, bitmap->GetSize().width, bitmap->GetSize().height);
+
+    gfx->GetDeviceContext()->DrawBitmap(
+        bitmap,
+        destRect,
+        opacity,
+        D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
+        renderArea);
+}
+
+
 //---------------------------------
 //=======================
 // MUTATORS / SETTERS
@@ -162,6 +220,10 @@ D2D1_SIZE_U GameObject::GetBmpPixelSize(void)
 	return bitmap->GetPixelSize();
 }
 
+/**
+* \brief Get the position center of the object..
+* \return D2D1_POINT_2F : The center of the object.
+*/
 D2D1_POINT_2F GameObject::GetCenter(void) {
     float left = GetX1();
     float right = GetX2();
@@ -171,18 +233,34 @@ D2D1_POINT_2F GameObject::GetCenter(void) {
     return D2D1::Point2F((left + right) / 2, (top + bottom) / 2);
 }
 
+/**
+* \brief Get position of the left-side of the object.
+* \return float : The left-side of the object.
+*/
 float GameObject::GetX1(void) {
 	return x1;
 }
 
+/**
+* \brief Get position of the top-side of the object.
+* \return float : The top-side of the object.
+*/
 float GameObject::GetY1(void) {
 	return y1;
 }
 
+/**
+* \brief Get position of the right-side of the object.
+* \return float : The right-side of the object.
+*/
 float GameObject::GetX2(void) {
 	return x2;
 }
 
+/**
+* \brief Get position of the bottom-side of the object.
+* \return float : The bottom-side of the object.
+*/
 float GameObject::GetY2(void) {
 	return y2;
 }
@@ -212,18 +290,30 @@ void GameObject::SetBmp(ID2D1Bitmap1* bmp)
 	bitmap = bmp;
 }
 
+/**
+* \brief Set position of the left-side of the object.
+*/
 void GameObject::SetX1(float x) {
 	x1 = x;
 }
 
+/**
+* \brief Set position of the top-side of the object.
+*/
 void GameObject::SetY1(float y) {
 	y1 = y;
 }
 
+/**
+* \brief Set position of the right-side of the object.
+*/
 void GameObject::SetX2(float x) {
 	x2 = x;
 }
 
+/**
+* \brief Set position of the bottom-side of the object.
+*/
 void GameObject::SetY2(float y) {
 	y2 = y;
 }

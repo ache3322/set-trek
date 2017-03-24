@@ -3,7 +3,7 @@
 * FILE			: MoveableObject.h
 * PROGRAMMER	: Austin Che
 * DATE			: 2017/02/8
-* DESCRIPTION	: 
+* DESCRIPTION	: The header file containing the class defintion for a MoveableObject.
 */
 #pragma once
 #include <Wincodec.h>
@@ -16,7 +16,7 @@
 // CONSTANTS
 //===================
 #define kConstSpeed     2.0f
-#define kDefaultHealth  20000.0f
+#define kDefaultHealth  10000.0f
 
 
 /**
@@ -33,6 +33,8 @@ private:
     float angle;                //!< The angle of the moveableobject
 
     float health;               //!< The health of the object
+
+    bool isColliding;           //!< Collision detected
 
 public:
 
@@ -61,6 +63,7 @@ public:
 	float GetCenterY(void);
     float GetAngle(void);
     float GetHealth(void);
+    bool IsColliding(void);
 
 	//-Mutators
 	void SetSpeedX(float x);
@@ -68,4 +71,5 @@ public:
     void SetBaseSpeed(float s);
     void SetAngle(float a);
     void SetHealth(float h);
+    void SetIsColliding(bool colliding);
 };

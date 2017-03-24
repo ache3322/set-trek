@@ -14,7 +14,7 @@
 // CONSTRUCTORS
 //=======================
 /**
-* \brief Constructor for the game object.
+* \brief Constructor for the moveable object.
 * \details Set the values to a default value.
 * \param graphics - Graphics* - A reference to the graphics object
 * \param area - D2D1_RECT_F - The dimensions of the screen
@@ -28,8 +28,16 @@ MoveableObject::MoveableObject()
     angle = 0.0f;
     
     health = kDefaultHealth;
+    isColliding = false;
 }
 
+/**
+* \brief Constructor for the moveable object. Takes
+*       in two parameters for the speeds.
+* \param xSpeed - float - The x-direction speed
+* \param ySpeed - float - The y-direction speed
+* \return None
+*/
 MoveableObject::MoveableObject(float xSpeed, float ySpeed)
 {
 	speedX = xSpeed;
@@ -38,8 +46,17 @@ MoveableObject::MoveableObject(float xSpeed, float ySpeed)
     angle = 0.0f;
 
     health = kDefaultHealth;
+    isColliding = false;
 }
 
+/**
+* \brief Constructor for the moveable object. Takes
+*       in three parameters for the speeds.
+* \param xSpeed - float - The x-direction speed
+* \param ySpeed - float - The y-direction speed
+* \param bSpeed - float - The base speed for the object.
+* \return None
+*/
 MoveableObject::MoveableObject(float xSpeed, float ySpeed, float bSpeed)
 {
     speedX = xSpeed;
@@ -48,6 +65,7 @@ MoveableObject::MoveableObject(float xSpeed, float ySpeed, float bSpeed)
     angle = 0.0f;
 
     health = kDefaultHealth;
+    isColliding = false;
 }
 
 
@@ -155,9 +173,18 @@ void MoveableObject::CalculateSpeed(float deltaX, float deltaY, float percent)
 }
 
 
-void MoveableObject::CalculateAngle(float opposite, float ajacent)
+/**
+* \brief Calculates the angle of rotation.
+* \details The angle of rotation is determined by the opposite
+*       and adjacent sides of a triangle. The arc tan is calculated
+*       and converted to degrees.
+* \param opposite - float - The opposite side (or y-side of a triangle)
+* \param adjacent - float - The adjacent side (or x-side of a triangle
+* \return None
+*/
+void MoveableObject::CalculateAngle(float opposite, float adjacent)
 {
-    float a = atan2f(opposite, ajacent) * 180.f / PI;
+    float a = atan2f(opposite, adjacent) * 180.f / PI;
 
     SetAngle(a);
 }
@@ -168,31 +195,74 @@ void MoveableObject::CalculateAngle(float opposite, float ajacent)
 // GETTERS
 //=======================
 //-------------------------------------------------
+/**
+* \brief Get the x-speed of the object.
+* \return float : X-speed of the object.
+*/
 float MoveableObject::GetSpeedX(void) const {
 	return speedX;
 }
+
+/**
+* \brief Get the y-speed of the object.
+* \return float : Y-speed of the object.
+*/
 float MoveableObject::GetSpeedY(void) const {
 	return speedY;
 }
+
+/**
+* \brief Get the base-speed of the object.
+* \return float : Base-speed of the object.
+*/
 float MoveableObject::GetBaseSpeed(void) 
 {
     return baseSpeed;
 }
+
+/**
+* \brief Get the center-x position
+* \return float : center-x position.
+*/
 float MoveableObject::GetCenterX(void) 
 {
 	return (GameObject::GetX1() + GameObject::GetX2()) / 2;
 }
+
+/**
+* \brief Get the center-y position
+* \return float : center-y position.
+*/
 float MoveableObject::GetCenterY(void) 
 {
 	return (GameObject::GetY1() + GameObject::GetY2()) / 2;
 }
+
+/**
+* \brief Get the angle of rotation.
+* \return float : the angle
+*/
 float MoveableObject::GetAngle(void)
 {
     return angle;
 }
+
+/**
+* \brief Get the health
+* \return float : health of the object.
+*/
 float MoveableObject::GetHealth(void)
 {
     return health;
+}
+
+/**
+* \brief Gets a boolean of if the object is colliding with something.
+* \return bool : true if collision detected; false if no collision
+*/
+bool MoveableObject::IsColliding(void)
+{
+    return isColliding;
 }
 
 
@@ -200,21 +270,54 @@ float MoveableObject::GetHealth(void)
 //=======================
 // SETTERS
 //=======================
+/**
+* \brief Sets the x-speed of the object.
+* \param x - float - The new x-speed.
+*/
 void MoveableObject::SetSpeedX(float x) {
 	speedX = x;
 }
+
+/**
+* \brief Sets the y-speed of the object.
+* \param y - float - The new y-speed.
+*/
 void MoveableObject::SetSpeedY(float y) {
 	speedY = y;
 }
+
+/**
+* \brief Sets the base-speed of the object.
+* \param s - float - The new base-speed.
+*/
 void MoveableObject::SetBaseSpeed(float s)
 {
     baseSpeed = s;
 }
+
+/**
+* \brief Sets the angle of rotation of the object.
+* \param a - float - The new angle
+*/
 void MoveableObject::SetAngle(float a)
 {
     angle = a;
 }
+
+/**
+* \brief Sets the health of the object.
+* \param h - float - The health
+*/
 void MoveableObject::SetHealth(float h)
 {
     health = h;
+}
+
+/**
+* \brief Sets if the object is colliding.
+* \param colliding - bool - A true/false value for collision
+*/
+void MoveableObject::SetIsColliding(bool colliding)
+{
+    isColliding = colliding;
 }

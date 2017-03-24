@@ -26,10 +26,10 @@ using namespace std;
 
 
 /**
-* \class Level1
-* \brief This is the first level.
-* \details The level will contain all the associated logic and assets
-*	associated for the initial level.
+* \class Level2
+* \brief This is the second level.
+* \details The level contains additional game elements like an enemy ship,
+*   collision detection, and movement.
 */
 class Level2 : public Level
 {
@@ -39,6 +39,7 @@ private:
 	float windowWidth;				//!< The total width of the window (x-direction)
 	float windowHeight;				//!< The total height of the window (y-direction)
 
+    GameObject* pGUIMenu;           //!< Demonstration purposes - shows a UI of exploration
 	GameObject* pBackground;		//!< The background sprite
 	MoveableObject* pPlayer;		//!< The player starship - the U.S.S Conestoga
     MoveableObject* pEnemy;         //!< The enemy start ship - the Klingon Bird of Prey

@@ -1,7 +1,7 @@
 /*
 * PROJECT		: SETTrek
 * FILE			: Graphics.cpp
-* PROGRAMMER	:
+* PROGRAMMER	: Austin Che
 * DATE			: 2017/01/25
 * DESCRIPTION	: The CPP file contains the implementation for the Graphics class. Examples
 *			like instantiating D2D1 COM objects, initialization, etc.
@@ -232,124 +232,6 @@ bool Graphics::Init(HWND windowHandle)
     //=====================
     //-------------------
     //--- INIT DIRECTX11
-    //D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE)
-    //ID3D11Texture2D* backBufferPtr;
-    //dxgiSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
-
-    //d3d11Device->CreateRenderTargetView(backBufferPtr, NULL, &_RenderTargetView);
-
-    //// Releasing the back buffer since it is no longer needed
-    //backBufferPtr->Release();
-    //backBufferPtr = nullptr;
-
-
-    //D3D11_TEXTURE2D_DESC depthBufferDesc = { 0 };
-    //// Set-up the description of the depth buffer
-    //depthBufferDesc.Width = clientSize.width;
-    //depthBufferDesc.Height = clientSize.height;
-    //depthBufferDesc.MipLevels = 1;
-    //depthBufferDesc.ArraySize = 1;
-    //depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    //depthBufferDesc.SampleDesc.Count = 1;
-    //depthBufferDesc.SampleDesc.Quality = 0;
-    //depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    //depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    //depthBufferDesc.CPUAccessFlags = 0;
-    //depthBufferDesc.MiscFlags = 0;
-
-    //d3d11Device->CreateTexture2D(&depthBufferDesc, NULL, &_depthStencilBuffer);
-
-
-    //// Set up the description of the stencil state
-    //D3D11_DEPTH_STENCIL_DESC depthStencilDesc = { 0 };
-    //depthStencilDesc.DepthEnable = true;
-    //depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-    //depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-    //
-    //depthStencilDesc.StencilEnable = true;
-    //depthStencilDesc.StencilReadMask = 0xFF;
-    //depthStencilDesc.StencilWriteMask = 0xFF;
-
-    //// Stencil operations if pixel is front-facing.
-    //depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-    //depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-    //depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-    //depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-    //// Stencil operations if pixel is back-facing.
-    //depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-    //depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-    //depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-    //depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-    //// CREATE
-    //d3d11Device->CreateDepthStencilState(&depthStencilDesc, &_depthStencilState);
-
-    //d3d11Context->OMSetDepthStencilState(_depthStencilState, 1);
-
-
-    //D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-    //// Initialize the depth stencil view.
-    //ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
-    //// Set up the depth stencil view description.
-    //depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    //depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-    //depthStencilViewDesc.Texture2D.MipSlice = 0;
-
-    //d3d11Device->CreateDepthStencilView(_depthStencilBuffer, &depthStencilViewDesc, &_depthStencilView);
-
-    //// Bind the render target view and depth stencil buffer to the output render pipeline.
-    //d3d11Context->OMSetRenderTargets(1, &_RenderTargetView, _depthStencilView);
-
-
-    //// Setup the raster description which will determine how and what polygons will be drawn.
-    //D3D11_RASTERIZER_DESC rasterDesc;
-    //rasterDesc.AntialiasedLineEnable = false;
-    //rasterDesc.CullMode = D3D11_CULL_BACK;
-    //rasterDesc.DepthBias = 0;
-    //rasterDesc.DepthBiasClamp = 0.0f;
-    //rasterDesc.DepthClipEnable = true;
-    //rasterDesc.FillMode = D3D11_FILL_SOLID;
-    //rasterDesc.FrontCounterClockwise = false;
-    //rasterDesc.MultisampleEnable = false;
-    //rasterDesc.ScissorEnable = false;
-    //rasterDesc.SlopeScaledDepthBias = 0.0f;
-
-    //// Create the rasterizer state from the description we just filled out.
-    //d3d11Device->CreateRasterizerState(&rasterDesc, &_rasterState);
-    //// Set the rasterizer state.
-    //d3d11Context->RSSetState(_rasterState);
-
-
-    //D3D11_VIEWPORT viewport;
-    //// Setup the viewport for rendering.
-    //viewport.Width = (float)clientSize.width;
-    //viewport.Height = (float)clientSize.height;
-    //viewport.MinDepth = 0.0f;
-    //viewport.MaxDepth = 1.0f;
-    //viewport.TopLeftX = 0.0f;
-    //viewport.TopLeftY = 0.0f;
-
-    //// Create the viewport.
-    //d3d11Context->RSSetViewports(1, &viewport);
-
-
-    //// Setup the projection matrix.
-    //float fieldOfView = 0.f; 
-    //float screenAspect = 0.f;
-    //fieldOfView = 3.141592654f / 4.0f;
-    //screenAspect = (float)clientSize.width / (float)clientSize.height;
-
-    //// Create the projection matrix for 3D rendering.
-    //_projectionMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_DEPTH);
-
-
-    //// Initialize the world matrix to the identity matrix.
-    //_worldMatrix = XMMatrixIdentity();
-
-
-    //// Create an orthographic projection matrix for 2D rendering.
-    //_orthoMatrix = XMMatrixOrthographicLH((float)clientSize.width, (float)clientSize.height, SCREEN_NEAR, SCREEN_DEPTH);
 
 	return true;
 }

@@ -31,8 +31,8 @@ using namespace Microsoft::WRL;	// For using ComPtr
 // GRAPHIC CONSTANTS
 //=============================
 #define PI                      3.14159265f
-#define kDefaultScreenWidth		800
-#define kDefaultScreenHeight	600
+#define kDefaultScreenWidth		1024
+#define kDefaultScreenHeight	768
 
 // CONSTANTS from Rastertek
 #define FULL_SCREEN             false

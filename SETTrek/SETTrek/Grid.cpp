@@ -26,7 +26,6 @@ Grid::Grid(void)
 }
 
 
-
 /**
 * \brief A Grid constructor taking 2 parameters.
 * \details The 2 parameters are floats for window sizes.
@@ -46,13 +45,20 @@ Grid::Grid(float width, float height)
 }
 
 
-
+/**
+* \brief Destructor for the Grid object.
+*/
 Grid::~Grid(void)
 {
 }
 
 
-
+/**
+* \brief Construct the space grid.
+* \details The calculation for the space grids are
+*       found by each row and column. Initially the an
+*       individual grid with and grid height is found.
+*/
 void Grid::ConstructGrid(void)
 {
 	int row = 0;
@@ -72,6 +78,11 @@ void Grid::ConstructGrid(void)
 }
 
 
+/**
+* \brief Generate random coordinates for Planet spawning.
+* \details The grid points are chosen at random. There is an
+*       approximately 5% chance that a Planet will spawn at the grid point.
+*/
 void Grid::GenerateRandCoord(void)
 {
 	bool isSpawn = false;

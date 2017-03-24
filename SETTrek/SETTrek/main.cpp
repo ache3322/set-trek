@@ -70,6 +70,48 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
+/*
+* \brief Initialize the main window.
+* \param hInstance - HINSTANCE - The handle instance of the client
+* \param nCmd - int - Describes how the Window will be shown
+* \return HWND : A handle to the window.
+*/
+HWND initWindow(HINSTANCE hInstance, int nCmd)
+{
+    /* WNDCLASSEX is a structure to describe the Window. */
+    WNDCLASSEX windowclass;
+    // We have to zero the memory
+    ZeroMemory(&windowclass, sizeof(WNDCLASSEX));
+    // cbSize configures the size of the window
+    windowclass.cbSize = sizeof(WNDCLASSEX);
+    // hbrBackground configures the color of the background
+    windowclass.hbrBackground = (HBRUSH)COLOR_WINDOW;
+    windowclass.hInstance = hInstance;
+    windowclass.lpfnWndProc = WindowProc;
+    // lpszClassName is the name of the window - (not the window title)
+    windowclass.lpszClassName = "MainWindow";
+    // style = CS_HREDRAW | CS_VREDRAW allows for the redrawing of horizontal and vertical window
+    // Allows for redrawing when vertially and horizontally
+    windowclass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+    // Loading the iconds
+    windowclass.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+    windowclass.hIconSm = windowclass.hIcon;
+    // Loading the default cursor
+    windowclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    RegisterClassEx(&windowclass);
+
+    // The rectangle specifys a width x height which will be  the size of the window
+    // Default: 1024 by 768
+    RECT rect = { 0, 0, kDefaultScreenWidth, kDefaultScreenHeight };
+    AdjustWindowRectEx(&rect, WS_OVERLAPPED, false, WS_EX_OVERLAPPEDWINDOW);
+
+    // We need to use rect because without using rect, the window will clip off a bit of dps to adjust for margins...
+    HWND windowHandle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, "MainWindow", "SET Trek", WS_OVERLAPPEDWINDOW, 100, 100,
+        rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, 0);
+
+    return windowHandle;
+}
+
 
 /**
 * \brief The wWinMain is the main entry point for the application.
@@ -150,47 +192,4 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 	GameManager::UnloadLevel();
 	delete graphics;
 	return 0;
-}
-
-
-/*
-* \brief Initialize the main window.
-* \param hInstance - HINSTANCE - The handle instance of the client
-* \param nCmd - int - Describes how the Window will be shown
-* \return HWND : A handle to the window.
-*/
-HWND initWindow(HINSTANCE hInstance, int nCmd)
-{
-	/* WNDCLASSEX is a structure to describe the Window. */
-	WNDCLASSEX windowclass;
-	// We have to zero the memory
-	ZeroMemory(&windowclass, sizeof(WNDCLASSEX));
-	// cbSize configures the size of the window
-	windowclass.cbSize = sizeof(WNDCLASSEX);
-	// hbrBackground configures the color of the background
-	windowclass.hbrBackground = (HBRUSH)COLOR_WINDOW;
-	windowclass.hInstance = hInstance;
-	windowclass.lpfnWndProc = WindowProc;
-	// lpszClassName is the name of the window - (not the window title)
-	windowclass.lpszClassName = "MainWindow";
-	// style = CS_HREDRAW | CS_VREDRAW allows for the redrawing of horizontal and vertical window
-	// Allows for redrawing when vertially and horizontally
-	windowclass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-    // Loading the iconds
-    windowclass.hIcon = LoadIcon(NULL, IDI_WINLOGO);
-    windowclass.hIconSm = windowclass.hIcon;
-    // Loading the default cursor
-    windowclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	RegisterClassEx(&windowclass);
-
-	// The rectangle specifys a width x height which will be  the size of the window
-	// Default: 1024 by 768
-	RECT rect = { 0, 0, kDefaultScreenWidth, kDefaultScreenHeight };
-	AdjustWindowRectEx(&rect, WS_OVERLAPPED, false, WS_EX_OVERLAPPEDWINDOW);
-
-	// We need to use rect because without using rect, the window will clip off a bit of dps to adjust for margins...
-	HWND windowHandle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, "MainWindow", "SET Trek", WS_OVERLAPPEDWINDOW, 100, 100,
-		rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, 0);
-
-	return windowHandle;
 }

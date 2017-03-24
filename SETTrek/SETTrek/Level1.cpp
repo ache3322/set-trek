@@ -1,9 +1,10 @@
 /*
 * PROJECT		: SETTrek
-* FILE			: Level.cpp
+* FILE			: Level1.cpp
 * PROGRAMMER	: Austin Che
 * DATE			: 2017/02/14
-* DESCRIPTION	:
+* DESCRIPTION	: The implementation for the Level1 class. This class demonstrates
+*       basic animations and drawings.
 */
 #include "Level1.h"
 

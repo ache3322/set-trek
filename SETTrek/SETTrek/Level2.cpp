@@ -3,7 +3,7 @@
 * FILE			: Level2.cpp
 * PROGRAMMER	: Austin Che
 * DATE			: 2017/02/14
-* DESCRIPTION	:
+* DESCRIPTION	: The CPP implementation for the Level2 class.
 */
 #include "Level2.h"
 
@@ -52,6 +52,13 @@ void Level2::Load(D2D1_RECT_F size)
 	starShipDetail->Init(L".\\assets\\ShipDetail.bmp");
     pEnemy->Init(L".\\assets\\EnemyShip.bmp");
 
+    //---------------------
+    // Loading Exploration GUI (WIP)
+    pGUIMenu = new GameObject();
+    pGUIMenu->Init(L".\\assets\\ExplorationGUI.bmp");
+    //
+    //---------------------
+
 
 	//---------------------
 	// Applying EffectManager effects
@@ -80,19 +87,20 @@ void Level2::Load(D2D1_RECT_F size)
     );
 
 	//---------------------
+    //
 	ComPtr<ID2D1Effect> shipBaseEffect;
 	ComPtr<ID2D1Effect> shipDetailEffect;
 
-	shipBaseEffect = EffectManager::CreateChroma(starShipBase->GetBmp(), 0.1f, 1);
+	shipBaseEffect = EffectManager::CreateChroma(starShipBase->GetBmp(), 0.55f, 0);
 	starShipBase->SetBmp(
 		EffectManager::ConvertToBitmap(shipBaseEffect.Get(), starShipBase->GetBmpPixelSize())
 	);
 
-	shipDetailEffect = EffectManager::CreateChroma(starShipDetail->GetBmp(), 0.1f, 1);
+	shipDetailEffect = EffectManager::CreateChroma(starShipDetail->GetBmp(), 0.4f, 0);
 	starShipDetail->SetBmp(
 		EffectManager::ConvertToBitmap(shipDetailEffect.Get(), starShipDetail->GetBmpPixelSize())
 	);
-
+    //
 	//---------------------
 
 	// Do the composite on the ship
@@ -130,14 +138,10 @@ void Level2::Load(D2D1_RECT_F size)
 
 	//--------------------
 	//-- Set the initial position of the Enemy Ship
-	pEnemy->SetX1(v2Grid[kCenterGrid].x);
-	pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
-	pEnemy->SetY1(v2Grid[kCenterGrid].y);
-	pEnemy->SetY2(v2Grid[kCenterGrid].y + grid->GetHeight());
-    pEnemy->SetX1(0);
-    pEnemy->SetX2(grid->GetWidth());
-    pEnemy->SetY1(0);
-    pEnemy->SetY2(grid->GetHeight());
+	pEnemy->SetX1(v2Grid[kEnemySpawn].x);
+	pEnemy->SetX2(v2Grid[kEnemySpawn].x + grid->GetWidth());
+	pEnemy->SetY1(v2Grid[kEnemySpawn].y);
+	pEnemy->SetY2(v2Grid[kEnemySpawn].y + grid->GetHeight());
 }
 
 
@@ -204,38 +208,45 @@ void Level2::Update(void)
     //
     float enemyBoundaryX = grid->GetWidth() * 1.0f;
     float enemyBoundaryY = grid->GetHeight() * 1.0f;
-    if ( (enemyCenterX - enemyBoundaryX < pPlayer->GetCenterX()) && (pPlayer->GetCenterX() < enemyCenterX + enemyBoundaryX)
-        && (enemyCenterY - enemyBoundaryY < pPlayer->GetCenterY()) && (pPlayer->GetCenterY() < enemyCenterY + enemyBoundaryY) )
+    if ((enemyCenterX - enemyBoundaryX < pPlayer->GetCenterX()) && (pPlayer->GetCenterX() < enemyCenterX + enemyBoundaryX)
+        && (enemyCenterY - enemyBoundaryY < pPlayer->GetCenterY()) && (pPlayer->GetCenterY() < enemyCenterY + enemyBoundaryY))
     {
-        string output = "Center of Player ( " + to_string(centerX) + ", " + to_string(centerY) + " )\n"
-            + "Center of Klingon ( " + to_string(enemyCenterX) + ", " + to_string(enemyCenterY) + " )\n"
-            + to_string(enemyCenterX + enemyBoundaryX) + " > " + to_string(centerX) + " > " + to_string(enemyCenterX - enemyBoundaryX) + "\n"
-            + to_string(enemyCenterY + enemyBoundaryY) + " > " + to_string(centerY) + " > " + to_string(enemyCenterY - enemyBoundaryY) + "\n"
-            + "Is Colliding!\n";
-        OutputDebugStringA(output.c_str());
-
+        // Player is taking DAMAGE!
         pPlayer->SetHealth(pPlayer->GetHealth() - 300);
     }
     else
     {
-        string output = "Center of Player ( " + to_string(centerX) + ", " + to_string(centerY) + " )\n"
-            + "Center of Klingon ( " + to_string(enemyCenterX) + ", " + to_string(enemyCenterY) + " )\n"
-            + to_string(enemyCenterX + enemyBoundaryX) + " > " + to_string(centerX) + " > " + to_string(enemyCenterX - enemyBoundaryX) + "\n"
-            + to_string(enemyCenterY + enemyBoundaryY) + " > " + to_string(centerY) + " > " + to_string(enemyCenterY - enemyBoundaryY) + "\n"
-            + "No Collision!\n";
-        OutputDebugStringA(output.c_str());
-    }
-
-    //string output = "Player health ( " + to_string(pPlayer->GetHealth()) + " )\n";
-    //OutputDebugStringA(output.c_str());
-    if (pPlayer->GetHealth() < 0.0f)
-    {
-        RespawnShips();
     }
     //
     //===--------
 
+    //===--------
+    // Planet Collision Detection
+    //
+    // NOTE: Collision Detection should happen before moving the Player
+    for (int i = 0; i < grid->GetRandCoordSize(); ++i)
+    {
+        D2D1_POINT_2F planetCenter = chosenPlanets[i]->GetCenter();
+        float planetCenterX = planetCenter.x;
+        float planetCenterY = planetCenter.y;
+        float halfGridWidth = (grid->GetWidth() * 0.5f);
+        float halfGridHeight = (grid->GetHeight() * 0.5f);
 
+        // Iterate through each Planet coordinates to determine
+        // if the Player has collided with a certain point...
+        if ((pPlayer->GetCenterX() < planetCenterX + halfGridWidth && pPlayer->GetCenterX() > planetCenterX - halfGridWidth)
+            && (pPlayer->GetCenterY() < planetCenterY + halfGridHeight && pPlayer->GetCenterY() > planetCenterY - halfGridHeight))
+        {
+            pPlayer->SetIsColliding(true);
+            break;
+        }
+        else
+        {
+            pPlayer->SetIsColliding(false);
+        }
+    }
+    //
+    //===--------
 
     //===--------
     // Enemy Movement
@@ -374,30 +385,13 @@ void Level2::Update(void)
     //===--------
 
     //===--------
-    // Planet Collision Detection
+    // Process Player Health
     //
-    // NOTE: Collision Detection should happen before moving the Player
-    for (int i = 0; i < grid->GetRandCoordSize(); ++i)
+    string output = "Player health ( " + to_string(pPlayer->GetHealth()) + " )\n";
+    OutputDebugStringA(output.c_str());
+    if (pPlayer->GetHealth() < 0.0f)
     {
-        D2D1_POINT_2F planetCenter = chosenPlanets[i]->GetCenter();
-        float planetCenterX = planetCenter.x;
-        float planetCenterY = planetCenter.y;
-        float halfGridWidth = (grid->GetWidth() * 0.5f) - kPlanetPadding;
-        float halfGridHeight = (grid->GetHeight() * 0.5f) - kPlanetPadding;
-
-        // Iterate through each Planet coordinates to determine
-        // if the Player has collided with a certain point...
-        if ( (pPlayer->GetCenterX() < planetCenterX + halfGridWidth && pPlayer->GetCenterX() > planetCenterX - halfGridWidth)
-            && (pPlayer->GetCenterY() < planetCenterY + halfGridHeight && pPlayer->GetCenterY() > planetCenterY - halfGridHeight) )
-        {
-            string output = "Colliding with planet!!! " + to_string(planetCenterX) + "\n";
-            OutputDebugStringA(output.c_str());
-
-            pPlayer->SetSpeedX(0.0f);
-            pPlayer->SetSpeedY(0.0f);
-            mouseXEnd = pPlayer->GetCenterX();
-            mouseYEnd = pPlayer->GetCenterY();
-        }
+        RespawnShips();
     }
     //
     //===--------
@@ -455,6 +449,16 @@ void Level2::Render(void)
 		pEnemy->GetX2(), pEnemy->GetY2());
 
     gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
+
+
+    //==----
+    // 5. Draw the Exploration GUI
+    //
+    // Only draw the UI if a Player is colliding with a Planet
+    if (pPlayer->IsColliding())
+    {
+        pGUIMenu->Draw(0, 0, 0.3f);
+    }
 }
 
 /**
@@ -533,4 +537,8 @@ void Level2::RespawnShips(void)
 
     isPlayerMoving = false;
     isPlayerDead = false;
+
+    // Load a new scene
+    grid->GenerateRandCoord();
+    GenerateRandomPlanet();
 }

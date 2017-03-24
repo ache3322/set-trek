@@ -48,6 +48,8 @@ public:
 
 	//-Draw Methods
 	void Draw(float left, float top, float right, float bottom);
+    void Draw(float left, float top, float right, float bottom, float opacity);
+    void Draw(float left, float top, float opacity = 1.0f);
 
 	//-Accessors
 	ID2D1Bitmap1* GetBmp(void);

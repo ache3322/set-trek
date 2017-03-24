@@ -3,7 +3,7 @@
 * FILE			: Level.h
 * PROGRAMMER	: Austin Che
 * DATE			: 2017/02/14
-* DESCRIPTION	:
+* DESCRIPTION	: Level1 contains the game objects and scene for the first level.
 */
 #pragma once
 #include "Level.h"

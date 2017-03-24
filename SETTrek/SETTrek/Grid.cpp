@@ -82,17 +82,20 @@ void Grid::GenerateRandCoord(void)
 	// that a planet will spawn...
 	for (int i = 0; i < grid.size(); ++i)
 	{
-		isSpawn = (rand() % 100) < kPlanetSpawnChance;
+        if (i != kPlayerSpawn)
+        {
+            isSpawn = (rand() % 100) < kPlanetSpawnChance;
 
-		if (isSpawn)
-		{
-			// These are the chosen grid positions 
-			// where a planet is going to be drawn at
-			vector2 vCoord = { grid[i].x, grid[i].y };
-			randGrid.push_back(vCoord);
+            if (isSpawn)
+            {
+                // These are the chosen grid positions 
+                // where a planet is going to be drawn at
+                vector2 vCoord = { grid[i].x, grid[i].y };
+                randGrid.push_back(vCoord);
 
-			isSpawn = false;
-		}
+                isSpawn = false;
+            }
+        }
 	}
 }
 

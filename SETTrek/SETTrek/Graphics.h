@@ -19,6 +19,10 @@
 #include <d3d11_1.h>
 #include <d2d1effects_2.h>
 #include <d2d1effecthelpers.h>
+// From Rasterek tutorial
+#include <DirectXMath.h>
+
+using namespace DirectX;
 using namespace Microsoft::WRL;	// For using ComPtr
 
 
@@ -27,8 +31,14 @@ using namespace Microsoft::WRL;	// For using ComPtr
 // GRAPHIC CONSTANTS
 //=============================
 #define PI                      3.14159265f
-#define kDefaultScreenWidth		1024
-#define kDefaultScreenHeight	768
+#define kDefaultScreenWidth		800
+#define kDefaultScreenHeight	600
+
+// CONSTANTS from Rastertek
+#define FULL_SCREEN             false
+#define VSYNC_ENABLED           false
+#define SCREEN_DEPTH            1000.0f
+#define SCREEN_NEAR             0.1f
 
 
 
@@ -56,18 +66,33 @@ private:
 	// Previous things....
 	ID2D1SolidColorBrush* brush;
 
-	// Direct3Dx11 objects
-	ID3D11Device1* d3d11Device;				//!< Direct3D device
-	ID3D11DeviceContext1* d3d11Context;		//!< Direct3D context device derived for Direct2D context device
-
 	// New Direct2D 1.1
 	ID2D1Factory1* d2d1Factory1;			//!< Direct2D factory - creates the tools to using Direct2D components
 	ID2D1DeviceContext* d2d1Context;		//!< Direct2D device context allows for renderable targets to be drawn
 	ID2D1Device* d2d1Device;				//!< Direct2D device 
-	IDXGISwapChain1* dxgiSwapChain;			//!< Direct2D swap chain
 	ID2D1Bitmap1* d2d1Bitmap;				//!< Direct 2D bitmap used as the render target for device context
 
 	DXGI_PRESENT_PARAMETERS parameters;		//!< DXGI parameters settings for swap chaining
+
+    //===-----------------
+    //
+    IDXGISwapChain1* dxgiSwapChain;			//!< Direct2D swap chain
+
+    // Direct3Dx11 objects
+    ID3D11Device1* d3d11Device;				        //!< Direct3D device
+    ID3D11DeviceContext1* d3d11Context;		        //!< Direct3D context device derived for Direct2D context device
+    ID3D11RenderTargetView* _RenderTargetView;      //!<
+    ID3D11Texture2D*        _depthStencilBuffer;    //!<
+    ID3D11DepthStencilState* _depthStencilState;    //!<
+    ID3D11DepthStencilView* _depthStencilView;      //!<
+    ID3D11RasterizerState*  _rasterState;           //!<
+    XMMATRIX _projectionMatrix;                     //!<
+    XMMATRIX _worldMatrix;                          //!<
+    XMMATRIX _orthoMatrix;                          //!<
+
+    //
+    //===-----------------
+    
 
 public:
 

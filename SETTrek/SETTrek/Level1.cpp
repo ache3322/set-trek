@@ -114,6 +114,11 @@ void Level1::Unload(void)
 }
 
 
+void Level1::Process(int x, int y)
+{
+}
+
+
 /**
 * \brief Update the game and objects.
 * \details Updates the game logic. The logic includes moving GameObjects
@@ -159,8 +164,8 @@ void Level1::Render(void)
 	}
 
 	// 3. Draw the Starship
-	pStarShip->Draw(pStarShip->GetX1(), v2Grid[kCenterGrid].y,
-		pStarShip->GetX1() + gridWidth, v2Grid[kCenterGrid].y + gridHeight);
+	pStarShip->Draw(pStarShip->GetX1(), v2Grid[kPlayerSpawn].y,
+		pStarShip->GetX1() + gridWidth, v2Grid[kPlayerSpawn].y + gridHeight);
 
 
 	// DEBUG: SHOWING GRID POINTS

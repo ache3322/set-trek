@@ -17,11 +17,18 @@ using namespace std;
 // CONSTANTS
 //===================
 #define kNumberOfGrid		10
+#define kMaximumRow         (kNumberOfGrid)
 #define kCenterGrid			49
 #define kWindowPadding      1.0f
 
 #define kPlanetPadding      5.0f
 #define kPlanetSpawnChance  2
+
+// MACRO to calculate Player's spawn position
+#define kPlayerSpawn        (kNumberOfGrid * ((unsigned int)(kNumberOfGrid * 0.5) - 1))
+
+// MACRO for the Klingon spawn position
+#define kEnemySpawn         (kNumberOfGrid * ((unsigned int)(kNumberOfGrid * 0.5) - 1) + (kMaximumRow - 1))
 
 
 //=============================

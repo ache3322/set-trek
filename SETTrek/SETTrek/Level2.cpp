@@ -12,6 +12,7 @@ float enemyAngle = 0.0f;
 float mouseXEnd = 0.0f;
 float mouseYEnd = 0.0f;
 bool isPlayerMoving = false;
+bool isPlayerDead = false;
 D2D1::Matrix3x2F trans;
 
 
@@ -41,7 +42,7 @@ void Level2::Load(D2D1_RECT_F size)
 	pPlanet3 = new GameObject();
 	unique_ptr<GameObject> starShipBase(new GameObject());
 	unique_ptr<GameObject> starShipDetail(new GameObject());
-    pEnemy = new MoveableObject(1.0f, 1.0f, 1.5f);
+    pEnemy = new MoveableObject(0.0f, 0.0f, 3.5f);
 
 	pBackground->Init(L".\\assets\\SectorBackground.bmp");
 	pPlanet1->Init(L".\\assets\\Planet1.bmp");
@@ -99,7 +100,7 @@ void Level2::Load(D2D1_RECT_F size)
 	compositeKey = EffectManager::CreateComposite(starShipBase->GetBmp(), starShipDetail->GetBmp());
 
 	// DEBUG/TEST
-	pPlayer = new MoveableObject(0, 0, 2.0f);
+	pPlayer = new MoveableObject(0, 0, 5.0f);
 	pPlayer->Init(L".\\assets\\ShipBase.bmp");
 	pPlayer->SetBmp(EffectManager::ConvertToBitmap(compositeKey.Get(), pPlayer->GetBmpPixelSize()));
 	// DEBUG/TEST
@@ -119,8 +120,8 @@ void Level2::Load(D2D1_RECT_F size)
     vector<vector2> v2Grid = grid->GetGrid();
     pPlayer->SetX1(0);
     pPlayer->SetX2(grid->GetWidth());
-    pPlayer->SetY1(v2Grid[kCenterGrid].y);
-    pPlayer->SetY2(v2Grid[kCenterGrid].y + grid->GetHeight());
+    pPlayer->SetY1(v2Grid[kPlayerSpawn].y);
+    pPlayer->SetY2(v2Grid[kPlayerSpawn].y + grid->GetHeight());
 
     mouseXEnd = pPlayer->GetCenterX();
     mouseYEnd = pPlayer->GetCenterY();
@@ -129,10 +130,10 @@ void Level2::Load(D2D1_RECT_F size)
 
 	//--------------------
 	//-- Set the initial position of the Enemy Ship
-	//pEnemy->SetX1(v2Grid[kCenterGrid].x);
-	//pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
-	//pEnemy->SetY1(v2Grid[kCenterGrid].y);
-	//pEnemy->SetY2(v2Grid[kCenterGrid].y + grid->GetHeight());
+	pEnemy->SetX1(v2Grid[kCenterGrid].x);
+	pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
+	pEnemy->SetY1(v2Grid[kCenterGrid].y);
+	pEnemy->SetY2(v2Grid[kCenterGrid].y + grid->GetHeight());
     pEnemy->SetX1(0);
     pEnemy->SetX2(grid->GetWidth());
     pEnemy->SetY1(0);
@@ -198,60 +199,94 @@ void Level2::Update(void)
     float enemyCenterX = pEnemy->GetCenterX();
     float enemyCenterY = pEnemy->GetCenterY();
 
+    //===--------
+    // Enemy Collision Detection
+    //
+    float enemyBoundaryX = grid->GetWidth() * 1.0f;
+    float enemyBoundaryY = grid->GetHeight() * 1.0f;
+    if ( (enemyCenterX - enemyBoundaryX < pPlayer->GetCenterX()) && (pPlayer->GetCenterX() < enemyCenterX + enemyBoundaryX)
+        && (enemyCenterY - enemyBoundaryY < pPlayer->GetCenterY()) && (pPlayer->GetCenterY() < enemyCenterY + enemyBoundaryY) )
+    {
+        string output = "Center of Player ( " + to_string(centerX) + ", " + to_string(centerY) + " )\n"
+            + "Center of Klingon ( " + to_string(enemyCenterX) + ", " + to_string(enemyCenterY) + " )\n"
+            + to_string(enemyCenterX + enemyBoundaryX) + " > " + to_string(centerX) + " > " + to_string(enemyCenterX - enemyBoundaryX) + "\n"
+            + to_string(enemyCenterY + enemyBoundaryY) + " > " + to_string(centerY) + " > " + to_string(enemyCenterY - enemyBoundaryY) + "\n"
+            + "Is Colliding!\n";
+        OutputDebugStringA(output.c_str());
+
+        pPlayer->SetHealth(pPlayer->GetHealth() - 300);
+    }
+    else
+    {
+        string output = "Center of Player ( " + to_string(centerX) + ", " + to_string(centerY) + " )\n"
+            + "Center of Klingon ( " + to_string(enemyCenterX) + ", " + to_string(enemyCenterY) + " )\n"
+            + to_string(enemyCenterX + enemyBoundaryX) + " > " + to_string(centerX) + " > " + to_string(enemyCenterX - enemyBoundaryX) + "\n"
+            + to_string(enemyCenterY + enemyBoundaryY) + " > " + to_string(centerY) + " > " + to_string(enemyCenterY - enemyBoundaryY) + "\n"
+            + "No Collision!\n";
+        OutputDebugStringA(output.c_str());
+    }
+
+    //string output = "Player health ( " + to_string(pPlayer->GetHealth()) + " )\n";
+    //OutputDebugStringA(output.c_str());
+    if (pPlayer->GetHealth() < 0.0f)
+    {
+        RespawnShips();
+    }
+    //
+    //===--------
+
+
 
     //===--------
     // Enemy Movement
     //
-  //  if (isPlayerMoving)
-  //  {
-  //      // Calc double the grid width - if enemy approaches within 2 grid spaces of player
-  //      float doubleGridWidth = grid->GetWidth() * 2;
-  //      float doubleGridHeight = grid->GetHeight() * 2;
+    if (isPlayerMoving)
+    {
+        // Calc double the grid width - if enemy approaches within 2 grid spaces of player
+        float doubleGridWidth = grid->GetWidth() * 2;
+        float doubleGridHeight = grid->GetHeight() * 2;
 
-		//float enemyDeltaX = pPlayer->GetCenterX() - pEnemy->GetCenterX();
-		//float enemyDeltaY = pPlayer->GetCenterY() - pEnemy->GetCenterY();
+		float enemyDeltaX = pPlayer->GetCenterX() - pEnemy->GetCenterX();
+		float enemyDeltaY = pPlayer->GetCenterY() - pEnemy->GetCenterY();
 
-		//pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY);
+		pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY);
 
-  //      // Check the if Klingon ship is within 2 grid spaces of the Player ship...
-  //      // if the Klingon is in 2 grid spaces, then the speed is increased by 10%
-		//if ( (centerX + doubleGridWidth > pEnemy->GetCenterX() && centerX - doubleGridWidth < pEnemy->GetCenterX())
-		//	&& (centerY + doubleGridHeight > pEnemy->GetCenterY() && centerY - doubleGridHeight < pEnemy->GetCenterY()) )
-		//{
-		//	// Calculating 15% of the speed for X and Y
-		//	pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY, 0.10f);
+        // Check the if Klingon ship is within 2 grid spaces of the Player ship...
+        // if the Klingon is in 2 grid spaces, then the speed is increased by 10%
+		if ( (centerX + doubleGridWidth > pEnemy->GetCenterX() && centerX - doubleGridWidth < pEnemy->GetCenterX())
+			&& (centerY + doubleGridHeight > pEnemy->GetCenterY() && centerY - doubleGridHeight < pEnemy->GetCenterY()) )
+		{
+			// Calculating 15% of the speed for X and Y
+			pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY, 0.10f);
+		}
 
-		//	//string output = "Enemy speed : " + to_string(pEnemy->GetSpeedX()) + " | " + to_string(pEnemy->GetSpeedY()) + "\n";
-		//	//OutputDebugStringA(output.c_str());
-		//}
+        //===--------
+        // Enemy Movement
+        //
+        if ( (centerX < pEnemy->GetCenterX() && centerX > pEnemy->GetCenterX())
+            && (centerY > pEnemy->GetCenterY() && centerY < pEnemy->GetCenterY()) )
+        {
+            // Do nothing if Klingon ship reaches the Player ship
+        }
+        else
+        {
+            pEnemy->SetX1(pEnemy->GetX1() + pEnemy->GetSpeedX());
+            pEnemy->SetX2(pEnemy->GetX2() + pEnemy->GetSpeedX());
+            pEnemy->SetY1(pEnemy->GetY1() + pEnemy->GetSpeedY());
+            pEnemy->SetY2(pEnemy->GetY2() + pEnemy->GetSpeedY());
+        }
 
-  //      //===--------
-  //      // Enemy Movement
-  //      //
-  //      if ( (centerX < pEnemy->GetCenterX() && centerX > pEnemy->GetCenterX())
-  //          && (centerY > pEnemy->GetCenterY() && centerY < pEnemy->GetCenterY()) )
-  //      {
-  //          // Do nothing if Klingon ship reaches the Player ship
-  //      }
-  //      else
-  //      {
-  //          pEnemy->SetX1(pEnemy->GetX1() + pEnemy->GetSpeedX());
-  //          pEnemy->SetX2(pEnemy->GetX2() + pEnemy->GetSpeedX());
-  //          pEnemy->SetY1(pEnemy->GetY1() + pEnemy->GetSpeedY());
-  //          pEnemy->SetY2(pEnemy->GetY2() + pEnemy->GetSpeedY());
-  //      }
+        if (pEnemy->GetX2() < 0)
+        {
+            vector<vector2> v2Grid = grid->GetGrid();
+            pEnemy->SetX1(v2Grid[kCenterGrid].x);
+            pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
+        }
 
-  //      if (pEnemy->GetX2() < 0)
-  //      {
-  //          vector<vector2> v2Grid = grid->GetGrid();
-  //          pEnemy->SetX1(v2Grid[kCenterGrid].x);
-  //          pEnemy->SetX2(v2Grid[kCenterGrid].x + grid->GetWidth());
-  //      }
-
-  //      enemyAngle = 180.f + (atan2f(enemyDeltaY, enemyDeltaX) * 180.f / PI);
-  //      //
-  //      //===--------
-  //  }
+        enemyAngle = 180.f + (atan2f(enemyDeltaY, enemyDeltaX) * 180.f / PI);
+        //
+        //===--------
+    }
     //
     //===--------
 
@@ -287,7 +322,7 @@ void Level2::Update(void)
     //  compensate for this - a padding is used to spawn the ship beyond the boundaries.
     //
     // CHECK the left-side of the screen
-    if (pPlayer->GetX1() < 0.0f - kWindowPadding)
+    if (pPlayer->GetX1() < -0.5f - kWindowPadding)
     {
         // The player appears on the right-side
         pPlayer->SetX1(grid->GetWindowWidth() - grid->GetWidth() - kWindowPadding);
@@ -366,28 +401,6 @@ void Level2::Update(void)
     }
     //
     //===--------
-
-    //===--------
-    // Enemy Collision Detection
-    //
-    float enemyBoundaryX = (enemyCenterX) * 0.9f;
-    float enemyBoundaryY = (enemyCenterY) * 0.9f;
-    if ( (pPlayer->GetCenterX() < enemyCenterX + enemyBoundaryX) && (pPlayer->GetCenterX() > enemyCenterX - enemyBoundaryX) 
-        && (pPlayer->GetCenterY() < enemyCenterY + enemyBoundaryY) && (pPlayer->GetCenterX() > enemyCenterY - enemyBoundaryY) )
-    {
-        //string output = "Center of Player ( " + to_string(centerX) + ", " + to_string(centerY) + ")\n";
-        pPlayer->SetHealth(pPlayer->GetHealth() - 300);
-    }
-    else
-    {
-        string output = "No collision with Klingon\n";
-        OutputDebugStringA(output.c_str());
-    }
-    //
-    //===--------
-
-    string output = "Player health ( " + to_string(pPlayer->GetHealth()) + " )\n";
-    OutputDebugStringA(output.c_str());
 }
 
 
@@ -489,4 +502,35 @@ void Level2::GenerateRandomPlanet(void)
         chosenPlanets[i]->SetY1(top);
         chosenPlanets[i]->SetY2(bottom);
 	}
+}
+
+
+/*
+* \brief Respawns the ships in the starting positions
+* \param None
+* \return None
+*/
+void Level2::RespawnShips(void)
+{
+    // Respawning the player
+    vector<vector2> v2Grid = grid->GetGrid();
+    pPlayer->SetX1(0);
+    pPlayer->SetX2(grid->GetWidth());
+    pPlayer->SetY1(v2Grid[kPlayerSpawn].y);
+    pPlayer->SetY2(v2Grid[kPlayerSpawn].y + grid->GetHeight());
+    // Reset the health and the angle of the ship
+    pPlayer->SetHealth(kDefaultHealth);
+    pPlayer->SetAngle(0.0f);
+
+    // Respawn the Klingon ship
+    pEnemy->SetX1(v2Grid[kEnemySpawn].x);
+    pEnemy->SetX2(v2Grid[kEnemySpawn].x + grid->GetWidth());
+    pEnemy->SetY1(v2Grid[kEnemySpawn].y);
+    pEnemy->SetY2(v2Grid[kEnemySpawn].y + grid->GetHeight());
+
+    mouseXEnd = pPlayer->GetCenterX();
+    mouseYEnd = pPlayer->GetCenterY();
+
+    isPlayerMoving = false;
+    isPlayerDead = false;
 }

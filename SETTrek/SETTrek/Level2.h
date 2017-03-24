@@ -59,4 +59,5 @@ public:
 	void Process(int x, int y) override;		// For processing input from the user and applying to game level
 
 	void GenerateRandomPlanet(void);
+    void RespawnShips(void);
 };

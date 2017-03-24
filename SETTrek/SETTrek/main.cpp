@@ -39,24 +39,31 @@ HWND initWindow(HINSTANCE hInstance, int nCmd);
 */
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// WM_DESTROY message - destroying the Window
-	if (uMsg == WM_DESTROY)
-	{
-		PostQuitMessage(0);
-		return 0;
-	}
+    switch (uMsg)
+    {
+    // WM_DESTROY message - destroying the Window
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
+
+    // Window is closing
+    case WM_CLOSE:
+        PostQuitMessage(0);
+        return 0;
+
+    case WM_LBUTTONDOWN:
+        xMousePos = GET_X_LPARAM(lParam);
+        yMousePos = GET_Y_LPARAM(lParam);
+        isClick = true;
+        break;
+    }
+
 	if (uMsg == WM_SIZE)
 	{
 		//WORD hi = HIWORD(lParam);
 		//WORD lo = LOWORD(lParam);
 		//isResize = true;
 		//graphics->Resize(hwnd);
-	}
-	if (uMsg == WM_LBUTTONDOWN)
-	{
-		xMousePos = GET_X_LPARAM(lParam);
-		yMousePos = GET_Y_LPARAM(lParam);
-        isClick = true;
 	}
 
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -168,7 +175,12 @@ HWND initWindow(HINSTANCE hInstance, int nCmd)
 	windowclass.lpszClassName = "MainWindow";
 	// style = CS_HREDRAW | CS_VREDRAW allows for the redrawing of horizontal and vertical window
 	// Allows for redrawing when vertially and horizontally
-	windowclass.style = CS_HREDRAW | CS_VREDRAW;
+	windowclass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+    // Loading the iconds
+    windowclass.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+    windowclass.hIconSm = windowclass.hIcon;
+    // Loading the default cursor
+    windowclass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	RegisterClassEx(&windowclass);
 
 	// The rectangle specifys a width x height which will be  the size of the window
@@ -179,8 +191,6 @@ HWND initWindow(HINSTANCE hInstance, int nCmd)
 	// We need to use rect because without using rect, the window will clip off a bit of dps to adjust for margins...
 	HWND windowHandle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, "MainWindow", "SET Trek", WS_OVERLAPPEDWINDOW, 100, 100,
 		rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, 0);
-
-    yMousePos = (rect.bottom + rect.top) / 2;
 
 	return windowHandle;
 }

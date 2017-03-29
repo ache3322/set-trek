@@ -42,7 +42,7 @@ private:
     ID3D11InputLayout*          _layout;
     ID3D11Buffer*               _matrixBuffer;
 
-    bool InitializeShader(ID3D11Device*, HWND, LPCWSTR vsFile, LPCWSTR psFile);
+    bool InitializeShader(ID3D11Device* device, HWND hwnd, LPCWSTR vsFile, LPCWSTR psFile);
     void OutputShaderErrorMessage(ID3D10Blob* error, HWND hwnd, LPCWSTR shaderFileName);
 
     bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX, XMMATRIX, XMMATRIX);

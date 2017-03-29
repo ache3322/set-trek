@@ -78,6 +78,9 @@
     <ClCompile Include="ShaderClass.cpp">
       <Filter>Source Files\3D Sources</Filter>
     </ClCompile>
+    <ClCompile Include="ModelClass.cpp">
+      <Filter>Source Files\3D Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -117,6 +120,9 @@
       <Filter>Header Files\3D Headers</Filter>
     </ClInclude>
     <ClInclude Include="ShaderClass.h">
+      <Filter>Header Files\3D Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelClass.h">
       <Filter>Header Files\3D Headers</Filter>
     </ClInclude>
   </ItemGroup>

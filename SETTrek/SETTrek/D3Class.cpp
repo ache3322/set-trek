@@ -33,10 +33,6 @@ D3Class::D3Class()
     _deviceContext1 = NULL;
     _renderTargetView = NULL;
 
-    _vertexShader = nullptr;
-    _vertexLayout = nullptr;
-    _pVertexBuffer = nullptr;
-
     _depthStencilBuffer = NULL;
     _depthStencilState = NULL;
     _depthStencilView = NULL;
@@ -60,10 +56,6 @@ D3Class::~D3Class()
     if (_device3d) _device3d->Release();
     if (_deviceContext1) _deviceContext1->Release();
     if (_renderTargetView) _renderTargetView->Release();
-
-    if (_vertexShader) _vertexShader->Release();
-    if (_vertexLayout) _vertexLayout->Release();
-    if (_pVertexBuffer) _pVertexBuffer->Release();
 
     if (_depthStencilBuffer) _depthStencilBuffer->Release();
     if (_depthStencilState) _depthStencilState->Release();

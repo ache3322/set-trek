@@ -144,6 +144,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="D3Class.cpp" />
     <ClCompile Include="EffectManager.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="SpriteSheet.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="D3Class.h" />
     <ClInclude Include="EffectManager.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameObject.h" />

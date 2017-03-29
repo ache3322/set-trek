@@ -52,6 +52,8 @@ Graphics::~Graphics()
 	if (d2d1Device) d2d1Device->Release();
 	if (dxgiSwapChain) dxgiSwapChain->Release();
 	if (d2d1Bitmap) d2d1Bitmap->Release();
+
+    CoUninitialize();
 }
 
 

@@ -25,6 +25,12 @@
     <Filter Include="Source Files\GameObj Sources">
       <UniqueIdentifier>{0d2a88e2-a064-48f4-aaa9-db8eb6e31232}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\3D Headers">
+      <UniqueIdentifier>{2aa856d9-3b85-4364-a583-ad607dd026a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\3D Sources">
+      <UniqueIdentifier>{0d675966-f33f-401c-aa98-4b427fb103b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -63,6 +69,9 @@
     <ClCompile Include="Object.cpp">
       <Filter>Source Files\GameObj Sources</Filter>
     </ClCompile>
+    <ClCompile Include="D3Class.cpp">
+      <Filter>Source Files\3D Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -97,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>Header Files\GameObj Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="D3Class.h">
+      <Filter>Header Files\3D Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

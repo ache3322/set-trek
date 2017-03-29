@@ -156,6 +156,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveableObject.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="ShaderClass.cpp" />
     <ClCompile Include="SpriteSheet.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,7 +171,12 @@
     <ClInclude Include="Level2.h" />
     <ClInclude Include="MoveableObject.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="ShaderClass.h" />
     <ClInclude Include="SpriteSheet.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="color.ps" />
+    <None Include="color.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

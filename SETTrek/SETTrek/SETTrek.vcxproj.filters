@@ -31,6 +31,9 @@
     <Filter Include="Source Files\3D Sources">
       <UniqueIdentifier>{0d675966-f33f-401c-aa98-4b427fb103b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{7688f9df-95df-44dd-be9a-a7c41231c6bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -72,6 +75,9 @@
     <ClCompile Include="D3Class.cpp">
       <Filter>Source Files\3D Sources</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderClass.cpp">
+      <Filter>Source Files\3D Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -110,5 +116,16 @@
     <ClInclude Include="D3Class.h">
       <Filter>Header Files\3D Headers</Filter>
     </ClInclude>
+    <ClInclude Include="ShaderClass.h">
+      <Filter>Header Files\3D Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="color.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="color.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

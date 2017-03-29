@@ -92,6 +92,7 @@ bool D3Class::Init(HWND windowHandle)
     HRESULT hr = S_OK;
     CoInitialize(nullptr);
 
+
     //=====================
     //-------------------
     // Acquire the client window size - for rendering targets on this dimension
@@ -106,24 +107,14 @@ bool D3Class::Init(HWND windowHandle)
 
 
     //=====================
-    //-------------------
+    //-- CREATE Direct3D Device
     // Creating Direct3D device and context - enables
     // us to use functionalities to be supported in Direct2D
     ComPtr<ID3D11Device> device;
     ComPtr<ID3D11DeviceContext> context;
-    //ComPtr<IDXGIDevice> dxgiDevice;
 
 
     UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-
-    D3D_DRIVER_TYPE driverTypes[] =
-    {
-        D3D_DRIVER_TYPE_HARDWARE,
-        D3D_DRIVER_TYPE_WARP,
-        D3D_DRIVER_TYPE_REFERENCE,
-    };
-    UINT numDriverTypes = ARRAYSIZE(driverTypes);
-
     // Set feature levels supported by our application
     D3D_FEATURE_LEVEL featureLevels[] =
     {
@@ -140,7 +131,7 @@ bool D3Class::Init(HWND windowHandle)
     //===-----
     // Creating the Direct3 device depending on the driver type
     //
-    _driverType = driverTypes[0];
+    _driverType = D3D_DRIVER_TYPE_HARDWARE;
     hr = D3D11CreateDevice(nullptr, _driverType, nullptr, creationFlags, featureLevels, ARRAYSIZE(featureLevels),
         D3D11_SDK_VERSION, &device, &_featureLevel, &context);
     if (FAILED(hr)) return false;
@@ -192,8 +183,8 @@ bool D3Class::Init(HWND windowHandle)
         swapChainDesc.SampleDesc.Quality = 0;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.BufferCount = 1;
+        swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
         swapChainDesc.Flags = 0;
-
 
         // Create the Swap Chain for the Window Handle
         hr = dxgiFactory2->CreateSwapChainForHwnd(
@@ -234,22 +225,146 @@ bool D3Class::Init(HWND windowHandle)
     if (FAILED(hr))
         return false;
 
-    context->OMSetRenderTargets(1, &_renderTargetView, nullptr);
 
+    //=======================
+    //-- Depth Buffers
+    //
+    D3D11_TEXTURE2D_DESC depthBufferDesc;
+    D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+
+    // Initialize the description of the depth buffer.
+    ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
+    // Set up the description of the depth buffer.
+    depthBufferDesc.Width = width;
+    depthBufferDesc.Height = height;
+    depthBufferDesc.MipLevels = 1;
+    depthBufferDesc.ArraySize = 1;
+    depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    depthBufferDesc.SampleDesc.Count = 1;
+    depthBufferDesc.SampleDesc.Quality = 0;
+    depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    depthBufferDesc.CPUAccessFlags = 0;
+    depthBufferDesc.MiscFlags = 0;
+
+    // Create the texture for the depth buffer using the filled out description.
+    hr = _device3d->CreateTexture2D(&depthBufferDesc, NULL, &_depthStencilBuffer);
+    if (FAILED(hr))
+        return false;
+
+
+    //=======================
+    //-- Stencil state
+    //
+    // Initialize the description of the stencil state.
+    ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+    // Set up the description of the stencil state.
+    depthStencilDesc.DepthEnable = true;
+    depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+    depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+    depthStencilDesc.StencilEnable = true;
+    depthStencilDesc.StencilReadMask = 0xFF;
+    depthStencilDesc.StencilWriteMask = 0xFF;
+
+    // Stencil operations if pixel is front-facing.
+    depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+    depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+    // Stencil operations if pixel is back-facing.
+    depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+    depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+    // Create the depth stencil state.
+    hr = _device3d->CreateDepthStencilState(&depthStencilDesc, &_depthStencilState);
+    if (FAILED(hr))
+        return false;
+
+    // Set the depth of the stencil state
+    _deviceContext1->OMSetDepthStencilState(_depthStencilState, 1);
+
+
+    //=======================
+    //-- Stencil View
+    //
+    // Initialize the depth stencil view.
+    ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+
+    // Set up the depth stencil view description.
+    depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    depthStencilViewDesc.Texture2D.MipSlice = 0;
+
+    // Create the depth stencil view.
+    hr = _device3d->CreateDepthStencilView(_depthStencilBuffer, &depthStencilViewDesc, &_depthStencilView);
+    if (FAILED(hr))
+        return false;
+
+    // Build the render target view and depth stencil buffer to output render pipeline
+    _deviceContext1->OMSetRenderTargets(1, &_renderTargetView, _depthStencilView);
+
+
+    //=======================
+    //-- Raster Description
+    //
+    D3D11_RASTERIZER_DESC rasterDesc;
+    // Setup the raster description which will determine how and what polygons will be drawn.
+    rasterDesc.AntialiasedLineEnable = false;
+    rasterDesc.CullMode = D3D11_CULL_BACK;
+    rasterDesc.DepthBias = 0;
+    rasterDesc.DepthBiasClamp = 0.0f;
+    rasterDesc.DepthClipEnable = true;
+    rasterDesc.FillMode = D3D11_FILL_SOLID;
+    rasterDesc.FrontCounterClockwise = false;
+    rasterDesc.MultisampleEnable = false;
+    rasterDesc.ScissorEnable = false;
+    rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+    hr = _device3d->CreateRasterizerState(&rasterDesc, &_rasterState);
+    if (FAILED(hr))
+        return false;
+
+    // Set the rasterize state
+    _deviceContext1->RSSetState(_rasterState);
+
+
+    //=======================
+    //-- Viewport
+    //
     // Setup the viewport
     D3D11_VIEWPORT vp;
     vp.Width = (FLOAT)width;
     vp.Height = (FLOAT)height;
     vp.MinDepth = 0.0f;
     vp.MaxDepth = 1.0f;
-    vp.TopLeftX = 0;
-    vp.TopLeftY = 0;
-    context->RSSetViewports(1, &vp);
+    vp.TopLeftX = 0.0f;
+    vp.TopLeftY = 0.0f;
+    _deviceContext1->RSSetViewports(1, &vp);
 
 
     //=======================
-    //-- Compile the VERTEX
+    //-- Matrix Setup
     //
+    float fieldOfView = 0.f;
+    float screenAspect = 0.f;
+
+    // Setup the projection matrix.
+    fieldOfView = 3.141592654f / 4.0f;
+    screenAspect = (float)width / (float)height;
+
+    // Create the projection matrix for 3D rendering.
+    _projectionMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_DEPTH);
+
+    // Initialize the world matrix to the identity matrix.
+    _worldMatrix = XMMatrixIdentity();
+
+    // Create an orthographic projection matrix for 2D rendering.
+    _orthoMatrix = XMMatrixOrthographicLH((float)width, (float)height, SCREEN_NEAR, SCREEN_DEPTH);
 
 
     return true;
@@ -268,7 +383,57 @@ ID2D1DeviceContext* D3Class::GetDeviceContext(void)
 }
 
 
-ID3D11DeviceContext* D3Class::GetDeviceContext3D(void)
+
+//---------------------------------
+//=======================
+// DIRECT3D METHODS
+//=======================
+void D3Class::BeginRender(void) 
+{
+    // Clear the render target
+    _deviceContext1->ClearRenderTargetView(_renderTargetView, Colors::MidnightBlue); 
+
+    // Clear the depth buffer
+    _deviceContext1->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+}
+
+
+void D3Class::EndRender(void) 
+{ 
+    _swapChain->Present(0, 0); 
+}
+
+
+ID3D11Device1* D3Class::GetDevice3D(void)
+{
+    return _device3d;
+}
+
+
+ID3D11DeviceContext1* D3Class::GetDeviceContext3D(void)
 {
     return _deviceContext1;
+}
+
+
+
+//---------------------------------
+//=======================
+// MATRIX METHODS
+//=======================
+void D3Class::GetProjectionMatrix(XMMATRIX& projectionMatrix)
+{
+    projectionMatrix = _projectionMatrix;
+}
+
+
+void D3Class::GetWorldMatrix(XMMATRIX& worldMatrix)
+{
+    worldMatrix = _worldMatrix;
+}
+
+
+void D3Class::GetOrthoMatrix(XMMATRIX& orthoMatrix)
+{
+    orthoMatrix = _orthoMatrix;
 }

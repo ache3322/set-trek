@@ -8,6 +8,7 @@
 #include <Windows.h>
 #include <Windowsx.h>
 #include "Graphics.h"
+#include "D3Class.h"
 #include "GameManager.h"
 #include "EffectManager.h"
 #include "Object.h"
@@ -121,75 +122,123 @@ HWND initWindow(HINSTANCE hInstance, int nCmd)
 * \param nCmdShow - int - Describes how the Window will be shown
 * \return int : The return for main
 */
+//int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int nCmdShow)
+//{
+//	// Initialize the Main Window
+//	HWND windowHandle = initWindow(hInstance, nCmdShow);
+//	if (!windowHandle)
+//		return -1;
+//
+//	// Get the actual size of the game window
+//	RECT windowSize;
+//	GetClientRect(windowHandle, &windowSize);
+//
+//	// Initialize the Graphics object
+//	graphics = new Graphics();
+//	if (!graphics->Init(windowHandle))
+//	{
+//		delete graphics;
+//		// An error occurred whilst initializing the graphics
+//		return -1;
+//	}
+//
+//	// Initialize the GameLevel (ensures Graphics object is known for all Levels)
+//	Level::Init(graphics);
+//	EffectManager::Init(graphics);
+//
+//    // Initailize the generic Object
+//    Object::Initialize(graphics, D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
+//
+//	// Initialize the GameManager
+//	GameManager::Init();
+//	// Load the initial level
+//	GameManager::LoadLevel(new Level2(), D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
+//
+//
+//	// Now show/display the window
+//	ShowWindow(windowHandle, nCmdShow);
+//
+//
+//    //===------------
+//    //
+//	/* GAMP LOOP */
+//    //
+//    //===------------
+//    MSG msg = { 0 };
+//	while (msg.message != WM_QUIT)
+//	{
+//		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+//		{
+//			DispatchMessage(&msg);
+//		}
+//		else
+//		{
+//			// Process input
+//            if (isClick) {
+//                GameManager::Process(xMousePos, yMousePos);
+//                isClick = false;
+//            }
+//
+//			// Update the game - any values, assets, coordinates, sizes
+//			GameManager::Update();
+//
+//			// Rendering...
+//			graphics->BeginDraw();
+//			// Render the Game
+//			GameManager::Render();
+//			graphics->EndDraw();
+//		}
+//	}
+//
+//	GameManager::UnloadLevel();
+//	delete graphics;
+//	return 0;
+//}
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int nCmdShow)
 {
-	// Initialize the Main Window
-	HWND windowHandle = initWindow(hInstance, nCmdShow);
-	if (!windowHandle)
-		return -1;
+    // Initialize the Main Window
+    HWND windowHandle = initWindow(hInstance, nCmdShow);
+    if (!windowHandle)
+        return -1;
 
-	// Get the actual size of the game window
-	RECT windowSize;
-	GetClientRect(windowHandle, &windowSize);
+    // Get the actual size of the game window
+    RECT windowSize;
+    GetClientRect(windowHandle, &windowSize);
 
-	// Initialize the Graphics object
-	graphics = new Graphics();
-	if (!graphics->Init(windowHandle))
-	{
-		delete graphics;
-		// An error occurred whilst initializing the graphics
-		return -1;
-	}
+    // Initialize the Graphics object
+    D3Class* d3class = new D3Class();
+    if (!d3class->Init(windowHandle))
+    {
+        delete d3class;
+        // An error occurred whilst initializing the graphics
+        return -1;
+    }
 
-	// Initialize the GameLevel (ensures Graphics object is known for all Levels)
-	Level::Init(graphics);
-	EffectManager::Init(graphics);
-
-    // Initailize the generic Object
-    Object::Initialize(graphics, D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
-
-	// Initialize the GameManager
-	GameManager::Init();
-	// Load the initial level
-	GameManager::LoadLevel(new Level2(), D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
-
-
-	// Now show/display the window
-	ShowWindow(windowHandle, nCmdShow);
+    // Now show/display the window
+    ShowWindow(windowHandle, nCmdShow);
 
 
     //===------------
     //
-	/* GAMP LOOP */
+    /* GAMP LOOP */
     //
     //===------------
     MSG msg = { 0 };
-	while (msg.message != WM_QUIT)
-	{
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			DispatchMessage(&msg);
-		}
-		else
-		{
-			// Process input
-            if (isClick) {
-                GameManager::Process(xMousePos, yMousePos);
-                isClick = false;
-            }
+    while (msg.message != WM_QUIT)
+    {
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        {
+            DispatchMessage(&msg);
+        }
+        else
+        {
+            d3class->BeginRender();
 
-			// Update the game - any values, assets, coordinates, sizes
-			GameManager::Update();
+            d3class->EndRender();
+        }
+    }
 
-			// Rendering...
-			graphics->BeginDraw();
-			// Render the Game
-			GameManager::Render();
-			graphics->EndDraw();
-		}
-	}
-
-	GameManager::UnloadLevel();
-	delete graphics;
-	return 0;
+    delete d3class;
+    return 0;
 }

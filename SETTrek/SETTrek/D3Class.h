@@ -4,7 +4,7 @@
 * PROGRAMMER	: Austin Che
 * DATE			: 2017/01/25
 * DESCRIPTION	: The header file containing the class definition for the Direct3D class.
-* CREDIT:
+* CREDIT        : http://www.rastertek.com/dx11s2tut04.html
 */
 #pragma once
 #include <Windows.h>
@@ -29,7 +29,8 @@ using namespace Microsoft::WRL;	// For using ComPtr
 //=============================
 // D3Class CONSTANTS
 //=============================
-
+#define SCREEN_DEPTH        1000.0f
+#define SCREEN_NEAR         0.1
 
 
 
@@ -62,18 +63,13 @@ private:
     ID3D11DeviceContext1*       _deviceContext1;		//!< Direct3D context device derived for Direct2D context device
     ID3D11RenderTargetView*     _renderTargetView;      //!<
 
-    ID3D11VertexShader*         _vertexShader;
-    ID3D11InputLayout*          _vertexLayout;
-    ID3D11Buffer*               _pVertexBuffer;
-
-
     ID3D11Texture2D*            _depthStencilBuffer;    //!<
     ID3D11DepthStencilState*    _depthStencilState;     //!<
     ID3D11DepthStencilView*     _depthStencilView;      //!<    
-    ID3D11RasterizerState*  _rasterState;           //!<
-    XMMATRIX _projectionMatrix;                     //!<
-    XMMATRIX _worldMatrix;                          //!<
-    XMMATRIX _orthoMatrix;                          //!<
+    ID3D11RasterizerState*      _rasterState;           //!<
+    XMMATRIX _projectionMatrix;                         //!<
+    XMMATRIX _worldMatrix;                              //!<
+    XMMATRIX _orthoMatrix;                              //!<
 
 
     D3D_DRIVER_TYPE _driverType;
@@ -95,7 +91,6 @@ public:
     /*-General Methods-*/
     //------------------
     bool Init(HWND windowHandle);
-    void Resize(HWND windowHandle);
 
     void BeginDraw(void) { d2d1Context->BeginDraw(); }
     void EndDraw(void);
@@ -103,7 +98,16 @@ public:
 
     /*-Direct3D Methods-*/
     //------------------
-    void BeginRender(void) { _deviceContext1->ClearRenderTargetView(_renderTargetView, Colors::MidnightBlue); }
-    void EndRender(void) { _swapChain->Present(0, 0); }
-    ID3D11DeviceContext* D3Class::GetDeviceContext3D(void);
+    void BeginRender(void);
+    void EndRender(void);
+
+    ID3D11Device1* GetDevice3D(void);
+    ID3D11DeviceContext1* GetDeviceContext3D(void);
+
+
+    /*-Matrix Methods-*/
+    //------------------
+    void GetProjectionMatrix(XMMATRIX&);
+    void GetWorldMatrix(XMMATRIX&);
+    void GetOrthoMatrix(XMMATRIX&);
 };

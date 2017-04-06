@@ -150,13 +150,14 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Level.cpp" />
-    <ClCompile Include="Level1.cpp" />
-    <ClCompile Include="Level2.cpp" />
+    <ClCompile Include="Level3.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveableObject.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="SpriteSheet.cpp" />
+    <ClCompile Include="StarshipObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3Class.h" />
@@ -165,12 +166,13 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Level.h" />
-    <ClInclude Include="Level1.h" />
-    <ClInclude Include="Level2.h" />
+    <ClInclude Include="Level3.h" />
     <ClInclude Include="MoveableObject.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="SpriteSheet.h" />
+    <ClInclude Include="StarshipObject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

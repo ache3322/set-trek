@@ -9,6 +9,9 @@
 #include <vector>
 #include <memory>
 #include "Graphics.h"
+#include "EffectManager.h"
+#include "Input.h"
+#include "Grid.h"
 
 
 
@@ -19,13 +22,16 @@
 class Level
 {
 protected:
-	static Graphics* gfx;		//!< Reference to the Graphics object
+	static Graphics* gfx;		    //!< Reference to the Graphics object
+    static D2D1_RECT_F screenSize;	//!< The rectangle area/size of where the object will be drawn 
+    static Grid* grid;              //!< The grid for the level
 
 public:
 
-	static void Init(Graphics * graphics);
+	static void Init(Graphics * graphics, D2D1_RECT_F screen);
+    static void ReInitGrid(void);
 
-	virtual void Load(D2D1_RECT_F size) = 0;	// For loading assets for the game level
+	virtual void Load(void) = 0;	            // For loading assets for the game level
 	virtual void Unload(void) = 0;				// For unloading assets from the game level
 	virtual void Update(void) = 0;				// For updating the game level
 	virtual void Render(void) = 0;				// For rendering the game level

@@ -48,17 +48,11 @@
     <ClCompile Include="EffectManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Level1.cpp">
-      <Filter>Source Files\Level Sources</Filter>
-    </ClCompile>
     <ClCompile Include="Level.cpp">
       <Filter>Source Files\Level Sources</Filter>
     </ClCompile>
     <ClCompile Include="Grid.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Level2.cpp">
-      <Filter>Source Files\Level Sources</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files\GameObj Sources</Filter>
@@ -71,6 +65,15 @@
     </ClCompile>
     <ClCompile Include="D3Class.cpp">
       <Filter>Source Files\3D Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Level3.cpp">
+      <Filter>Source Files\Level Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StarshipObject.cpp">
+      <Filter>Source Files\GameObj Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -89,14 +92,8 @@
     <ClInclude Include="Level.h">
       <Filter>Header Files\Level Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Level1.h">
-      <Filter>Header Files\Level Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Grid.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Level2.h">
-      <Filter>Header Files\Level Headers</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Header Files\GameObj Headers</Filter>
@@ -109,6 +106,15 @@
     </ClInclude>
     <ClInclude Include="D3Class.h">
       <Filter>Header Files\3D Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Level3.h">
+      <Filter>Header Files\Level Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StarshipObject.h">
+      <Filter>Header Files\GameObj Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

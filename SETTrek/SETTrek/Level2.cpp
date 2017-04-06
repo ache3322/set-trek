@@ -23,12 +23,12 @@ D2D1::Matrix3x2F trans;
 * \param size - D2D1_RECT_F - The dimensions of the window
 * \return void
 */
-void Level2::Load(D2D1_RECT_F size)
+void Level2::Load()
 {
 	// Ensure the random number generator is operation
 	srand((unsigned int)time(NULL));
 
-	screenSize = size;
+    // Store the window width and height
 	windowWidth = screenSize.right;
 	windowHeight = screenSize.bottom;
 

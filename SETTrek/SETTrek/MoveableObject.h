@@ -25,14 +25,12 @@
 */
 class MoveableObject : public GameObject
 {
-private:
+protected:
 
 	float speedX;				//!< The moving speed - in x-direction
 	float speedY;				//!< The moving speed - in y-direction
     float baseSpeed;            //!< The base speed of the object
     float angle;                //!< The angle of the moveableobject
-
-    float health;               //!< The health of the object
 
     bool isColliding;           //!< Collision detected
 
@@ -50,26 +48,30 @@ public:
     virtual void Init(LPCWSTR fileName);
     virtual Graphics* GetGfx(void);
 
+    //-Draw Methods
+    virtual void Draw(float left, float top, float right, float bottom) override;
+    virtual void Draw(float left, float top, float right, float bottom, float opacity) override;
+    virtual void Draw(float left, float top, float opacity = 1.0f) override;
+
     //-Methods
     void CalculateSpeed(float deltaX, float deltaY);
 	void CalculateSpeed(float deltaX, float deltaY, float multiplier);
     void CalculateAngle(float opposite, float ajacent);
+    void ResetSpeed(void);
 
 	//-Accessors
-	float GetSpeedX(void) const;
-	float GetSpeedY(void) const;
+	float GetSpeedX(void);
+	float GetSpeedY(void);
     float GetBaseSpeed(void);
 	float GetCenterX(void);
 	float GetCenterY(void);
     float GetAngle(void);
-    float GetHealth(void);
     bool IsColliding(void);
 
 	//-Mutators
-	void SetSpeedX(float x);
-	void SetSpeedY(float y);
+    void SetSpeedX(float x);
+    void SetSpeedY(float y);
     void SetBaseSpeed(float s);
     void SetAngle(float a);
-    void SetHealth(float h);
     void SetIsColliding(bool colliding);
 };

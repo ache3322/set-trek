@@ -17,12 +17,11 @@
 * \param size - D2D1_RECT_F - The dimensions of the window
 * \return void
 */
-void Level1::Load(D2D1_RECT_F size)
+void Level1::Load(void)
 {
 	// Ensure the random number generator is operation
 	srand((unsigned int)time(NULL));
 
-	screenSize = size;
 	windowWidth = screenSize.right;
 	windowHeight = screenSize.bottom;
 

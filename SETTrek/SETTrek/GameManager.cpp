@@ -10,6 +10,7 @@
 
 Level* GameManager::currentLevel;	// Static variable instance of Level
 bool GameManager::IsLoading;		// Using the static boolean
+bool GameManager::IsPaused;
 
 
 /**
@@ -19,6 +20,7 @@ bool GameManager::IsLoading;		// Using the static boolean
 void GameManager::Init(void)
 {
 	IsLoading = true;
+    IsPaused = false;
 	currentLevel = NULL;
 }
 
@@ -28,12 +30,12 @@ void GameManager::Init(void)
 * \param level - Level* - The level being loaded
 * \param size - D2D1_RECT_F - The dimensions of the window screen (client screen)
 */
-void GameManager::LoadLevel(Level* level, D2D1_RECT_F size)
+void GameManager::LoadLevel(Level* level)
 {
 	IsLoading = true;
 
 	currentLevel = level;
-	currentLevel->Load(size);
+	currentLevel->Load();
 
 	IsLoading = false;		// Finished loading the level
 }
@@ -46,13 +48,13 @@ void GameManager::LoadLevel(Level* level, D2D1_RECT_F size)
 * \param level - Level* - The level being loaded
 * \param size - D2D1_RECT_F - The dimensions of the window screen (client screen)
 */
-void GameManager::SwitchLevel(Level* newLevel, D2D1_RECT_F size)
+void GameManager::SwitchLevel(Level* newLevel)
 {
 	IsLoading = true;
 
 	currentLevel->Unload();
 	currentLevel = newLevel;
-	currentLevel->Load(size);
+	currentLevel->Load();
 
 	IsLoading = false;
 }

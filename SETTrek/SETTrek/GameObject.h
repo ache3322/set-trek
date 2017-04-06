@@ -47,12 +47,12 @@ public:
     virtual Graphics* GetGfx(void);
 
 	//-Draw Methods
-	void Draw(float left, float top, float right, float bottom);
-    void Draw(float left, float top, float right, float bottom, float opacity);
-    void Draw(float left, float top, float opacity = 1.0f);
+	virtual void Draw(float left, float top, float right, float bottom);
+    virtual void Draw(float left, float top, float right, float bottom, float opacity);
+    virtual void Draw(float left, float top, float opacity = 1.0f);
 
 	//-Accessors
-	ID2D1Bitmap1* GetBmp(void);
+	virtual ID2D1Bitmap1* GetBmp(void);
 	D2D1_SIZE_U GetBmpPixelSize(void);
     D2D1_POINT_2F GetCenter(void);
 	virtual float GetX1(void);

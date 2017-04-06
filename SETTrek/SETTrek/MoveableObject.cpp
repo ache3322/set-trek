@@ -1,9 +1,9 @@
 /*
 * PROJECT		: SETTrek
-* FILE			: GameObject.cpp
+* FILE			: MoveableObject.cpp
 * PROGRAMMER	: Austin Che
 * DATE			: 2017/02/8
-* DESCRIPTION	: The CPP file implementation for the GameObject class.
+* DESCRIPTION	: The CPP file implementation for the MoveableObject class.
 */
 #include "MoveableObject.h"
 
@@ -16,9 +16,6 @@
 /**
 * \brief Constructor for the moveable object.
 * \details Set the values to a default value.
-* \param graphics - Graphics* - A reference to the graphics object
-* \param area - D2D1_RECT_F - The dimensions of the screen
-* \return None
 */
 MoveableObject::MoveableObject()
 {
@@ -26,8 +23,7 @@ MoveableObject::MoveableObject()
 	speedY = 0.0f;
     baseSpeed = 1.0f;
     angle = 0.0f;
-    
-    health = kDefaultHealth;
+
     isColliding = false;
 }
 
@@ -45,7 +41,6 @@ MoveableObject::MoveableObject(float xSpeed, float ySpeed)
     baseSpeed = 1.0f;
     angle = 0.0f;
 
-    health = kDefaultHealth;
     isColliding = false;
 }
 
@@ -64,7 +59,6 @@ MoveableObject::MoveableObject(float xSpeed, float ySpeed, float bSpeed)
     baseSpeed = bSpeed;
     angle = 0.0f;
 
-    health = kDefaultHealth;
     isColliding = false;
 }
 
@@ -113,6 +107,91 @@ void MoveableObject::Init(LPCWSTR fileName)
 Graphics* MoveableObject::GetGfx(void)
 {
     return gfx;
+}
+
+
+/**
+* \brief Draws the game object to the screen.
+* \details Using the Direct2D device context, the game
+*	object is drawn to the screen. Four points must be specified
+*	for the bitmap to be drawn to the screen. As well, the dimensions
+*	of the screen is included to draw the image to the specified screen.
+* \param left - float - The left of the rectangle
+* \param top - float - The top of the rectangle
+* \param right - float - The right of the rectangle
+* \param bottom - float - The bottom of the rectangle
+* \return void
+*/
+void MoveableObject::Draw(float left, float top, float right, float bottom)
+{
+    // Refers to the location of where the bitmap
+    // will be drawn, relative to the source (area) rectangle
+    // The rectangle needs 4 points to be drawn!
+    D2D1_RECT_F destRect = D2D1::RectF(left, top, right, bottom);
+
+    float angle = this->GetAngle();
+    D2D1_POINT_2F center = this->GetCenter();
+
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Rotation(angle, center));
+
+    GameObject::Draw(left, top, right, bottom);
+
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
+}
+
+
+/**
+* \brief Draws the game object to the screen.
+* \details Draws the object with an opacity level
+* \param left - float - The left of the rectangle
+* \param top - float - The top of the rectangle
+* \param right - float - The right of the rectangle
+* \param bottom - float - The bottom of the rectangle
+* \param opacity - float - How transparent the object will be
+* \return void
+*/
+void MoveableObject::Draw(float left, float top, float right, float bottom, float opacity)
+{
+    D2D1_RECT_F destRect = D2D1::RectF(left, top, right, bottom);
+
+    float angle = this->GetAngle();
+    D2D1_POINT_2F center = this->GetCenter();
+
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Rotation(angle, center));
+
+    GameObject::Draw(GetX1(), GetY1(), GetX2(), GetY2());
+
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
+}
+
+
+/**
+* \brief Draws the game object to the screen.
+* \details An additional opacity parameter will adjust the transparency
+*   of the object.
+*
+*   This Draw method takes in two points instead of four points. The right and bottom
+*   boundaries are gotten from the bitmap size itself.
+*
+* \param left - float - The left of the rectangle
+* \param top - float - The top of the rectangle
+* \param opacity - float - How transparent the object will be
+* \see void MoveableObject::Draw(float left, float top, float right, float bottom)
+* \see void MoveableObject::Draw(float left, float top, float right, float bottom, float opacity)
+* \return void
+*/
+void MoveableObject::Draw(float left, float top, float opacity)
+{
+    D2D1_RECT_F destRect = D2D1::RectF(left, top, GameObject::GetBmp()->GetSize().width, GameObject::GetBmp()->GetSize().height);
+
+    float angle = this->GetAngle();
+    D2D1_POINT_2F center = this->GetCenter();
+
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Rotation(angle, center));
+
+    GameObject::Draw(GetX1(), GetY1(), GetX2(), GetY2());
+
+    gfx->GetDeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
 }
 
 
@@ -190,6 +269,18 @@ void MoveableObject::CalculateAngle(float opposite, float adjacent)
 }
 
 
+/**
+* \brief Set the speed (x and y) to zero.
+* \details Reseting the speed will ensure the object will not move at all.
+*/
+void MoveableObject::ResetSpeed(void)
+{
+    speedX = 0.0f;
+    speedY = 0.0f;
+}
+
+
+
 //---------------------------------
 //=======================
 // GETTERS
@@ -199,7 +290,7 @@ void MoveableObject::CalculateAngle(float opposite, float adjacent)
 * \brief Get the x-speed of the object.
 * \return float : X-speed of the object.
 */
-float MoveableObject::GetSpeedX(void) const {
+float MoveableObject::GetSpeedX(void) {
 	return speedX;
 }
 
@@ -207,7 +298,7 @@ float MoveableObject::GetSpeedX(void) const {
 * \brief Get the y-speed of the object.
 * \return float : Y-speed of the object.
 */
-float MoveableObject::GetSpeedY(void) const {
+float MoveableObject::GetSpeedY(void) {
 	return speedY;
 }
 
@@ -245,15 +336,6 @@ float MoveableObject::GetCenterY(void)
 float MoveableObject::GetAngle(void)
 {
     return angle;
-}
-
-/**
-* \brief Get the health
-* \return float : health of the object.
-*/
-float MoveableObject::GetHealth(void)
-{
-    return health;
 }
 
 /**
@@ -302,15 +384,6 @@ void MoveableObject::SetBaseSpeed(float s)
 void MoveableObject::SetAngle(float a)
 {
     angle = a;
-}
-
-/**
-* \brief Sets the health of the object.
-* \param h - float - The health
-*/
-void MoveableObject::SetHealth(float h)
-{
-    health = h;
 }
 
 /**

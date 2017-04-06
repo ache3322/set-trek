@@ -35,7 +35,6 @@ class Level2 : public Level
 {
 private:
 
-	D2D1_RECT_F screenSize;			//!< The size of the Game area (window)
 	float windowWidth;				//!< The total width of the window (x-direction)
 	float windowHeight;				//!< The total height of the window (y-direction)
 
@@ -53,7 +52,7 @@ private:
 
 public:
 
-	void Load(D2D1_RECT_F size) override;		// For loading assets for the game level
+	void Load(void) override;		// For loading assets for the game level
 	void Unload(void) override;					// For unloading assets from the game level
 	void Update(void) override;					// For updating the game level
 	void Render(void) override;					// For rendering the game level

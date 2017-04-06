@@ -29,9 +29,10 @@ private:
 public:
 
 	static bool IsLoading;			//!< The current state of the game - is it loading?
+    static bool IsPaused;
 
-	static void LoadLevel(Level* level, D2D1_RECT_F size);
-	static void SwitchLevel(Level* newLevel, D2D1_RECT_F size);
+	static void LoadLevel(Level* level);
+	static void SwitchLevel(Level* newLevel);
 	static void UnloadLevel(void);
 
 	static void Init(void);

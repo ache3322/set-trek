@@ -388,3 +388,13 @@ void Graphics::DrawRectangle(float left, float top, float right, float bottom, f
 	// Render the shape on the target...
 	d2d1Context->DrawRectangle(D2D1::Rect(left, top, right, bottom), brush, 3.0f);
 }
+
+
+
+void Graphics::DrawLine(float pX1, float pY1, float pX2, float pY2, float r, float g, float b, float thickness)
+{
+    brush->SetColor(D2D1::ColorF(r, g, b, 1));
+
+    // Render the line on the render target...
+    d2d1Context->DrawLine(D2D1::Point2F(pX1, pY1), D2D1::Point2F(pX2, pY2), brush, thickness);
+}

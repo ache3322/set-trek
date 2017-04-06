@@ -116,4 +116,5 @@ public:
 	void ClearScreen(float r, float g, float b);
 	void DrawCircle(float c, float y, float radius, float r, float g, float b, float a = 1.0f);
 	void DrawRectangle(float left, float top, float right, float bottom, float r, float g, float b, float a);
+    void DrawLine(float pX1, float pY1, float pX2, float pY2, float r, float g, float b, float thickness = 1.0f);
 };

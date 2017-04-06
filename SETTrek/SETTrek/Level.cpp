@@ -12,6 +12,8 @@
 
 //-STATIC VARIABLE INSTANCE
 Graphics* Level::gfx;
+D2D1_RECT_F Level::screenSize;
+Grid* Level::grid;
 
 
 
@@ -19,7 +21,28 @@ Graphics* Level::gfx;
 * \brief Ensures the Level has access to the Graphics object.
 * \param graphics - Graphics* - A reference to the Graphics object.
 */
-void Level::Init(Graphics* graphics)
+void Level::Init(Graphics* graphics, D2D1_RECT_F screen)
 {
 	gfx = graphics;
+    screenSize = screen;
+
+    grid = new Grid(screenSize.right, screenSize.bottom);
+}
+
+
+/**
+* \brief Reinitialize the grid size.
+*/
+void Level::ReInitGrid(void)
+{
+    if (grid) 
+    {
+        delete grid;
+        grid = nullptr;
+    }
+
+    if (!grid)
+    {
+        grid = new Grid(screenSize.right, screenSize.bottom);
+    }
 }

@@ -7,19 +7,19 @@
 */
 #include <Windows.h>
 #include <Windowsx.h>
+#include <timeapi.h>
 #include "Graphics.h"
+#include "Input.h"
 #include "GameManager.h"
 #include "EffectManager.h"
 #include "Object.h"
 #include "Level.h"
-#include "Level1.h"
-#include "Level2.h"
+#include "Level3.h"
 
 
 //-GLOBAL VARIABLES
 Graphics* graphics;
 volatile bool isResize;
-volatile bool isClick = false;
 int xMousePos = 0;
 int yMousePos = 0;
 
@@ -51,10 +51,18 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         return 0;
 
+    // Left Mouse click
     case WM_LBUTTONDOWN:
-        xMousePos = GET_X_LPARAM(lParam);
-        yMousePos = GET_Y_LPARAM(lParam);
-        isClick = true;
+        Input::I_leftMouseX = (float)GET_X_LPARAM(lParam);
+        Input::I_leftMouseY = (float)GET_Y_LPARAM(lParam);
+        Input::isLeftClick = true;
+        break;
+
+    // Right Mouse click
+    case WM_RBUTTONDOWN:
+        Input::I_rightMouseX = (float)GET_X_LPARAM(lParam);
+        Input::I_rightMouseY = (float)GET_Y_LPARAM(lParam);
+        Input::isRightClick = true;
         break;
     }
 
@@ -141,23 +149,30 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 		return -1;
 	}
 
+
+    // Initialize the Input class
+    Input::InitInput();
+
+    // Get the window size
+    D2D1_RECT_F size = D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom);
+
 	// Initialize the GameLevel (ensures Graphics object is known for all Levels)
-	Level::Init(graphics);
+	Level::Init(graphics, size);
 	EffectManager::Init(graphics);
 
     // Initailize the generic Object
-    Object::Initialize(graphics, D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
+    Object::Initialize(graphics, size);
 
 	// Initialize the GameManager
 	GameManager::Init();
 	// Load the initial level
-	GameManager::LoadLevel(new Level2(), D2D1::RectF(0, 0, (FLOAT)windowSize.right, (FLOAT)windowSize.bottom));
+	GameManager::LoadLevel(new Level3());
 
 
 	// Now show/display the window
 	ShowWindow(windowHandle, nCmdShow);
 
-
+    
     //===------------
     //
 	/* GAMP LOOP */
@@ -173,11 +188,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 		else
 		{
 			// Process input
-            if (isClick) {
-                GameManager::Process(xMousePos, yMousePos);
-                isClick = false;
+            if (Input::isLeftClick || Input::isRightClick) 
+            {
+                GameManager::Process(Input::I_leftMouseX, Input::I_leftMouseY);
+                Input::isLeftClick = false;
+                Input::isRightClick = false;
             }
-
+            
 			// Update the game - any values, assets, coordinates, sizes
 			GameManager::Update();
 

@@ -11,6 +11,7 @@
 #include "Graphics.h"
 #include "EffectManager.h"
 #include "Input.h"
+#include "TimerClass.h"
 #include "Grid.h"
 
 

@@ -25,6 +25,8 @@ StarshipObject::StarshipObject()
     laserSpeedX = 0.0f;
     laserSpeedY = 0.0f;
 
+    laserAmmo = kDefaultAmmoLimit;
+
     isMoving = true;
     isColliding = false;
     isDead = false;
@@ -46,6 +48,8 @@ StarshipObject::StarshipObject(float x, float y)
     laserY = 0.0f;
     laserSpeedX = 0.0f;
     laserSpeedY = 0.0f;
+
+    laserAmmo = kDefaultAmmoLimit;
 
     isMoving = true;
     isColliding = false;
@@ -70,6 +74,8 @@ StarshipObject::StarshipObject(float xSpeed, float ySpeed, float baseSpeed)
     laserSpeedX = 0.0f;
     laserSpeedY = 0.0f;
 
+    laserAmmo = kDefaultAmmoLimit;
+
     isMoving = true;
     isColliding = false;
     isDead = false;
@@ -93,6 +99,8 @@ StarshipObject::StarshipObject(float xSpeed, float ySpeed, float baseSpeed, floa
     laserY = 0.0f;
     laserSpeedX = 0.0f;
     laserSpeedY = 0.0f;
+
+    laserAmmo = kDefaultAmmoLimit;
 
     isMoving = true;
     isColliding = false;
@@ -299,6 +307,15 @@ float StarshipObject::GetLaserSpeedY(void)
 }
 
 /**
+* \brief Get the laser ammo that the starship has.
+* \return int : The laser ammo.
+*/
+int StarshipObject::GetLaserAmmo(void)
+{
+    return laserAmmo;
+}
+
+/**
 * \brief Gets a boolean of if the object is moving.
 * \return bool : true if collision detected; false if no collision
 */
@@ -373,6 +390,18 @@ void StarshipObject::SetLaserSpeedX(float speedX)
 void StarshipObject::SetLaserSpeedY(float speedY)
 {
     laserSpeedY = speedY;
+}
+
+/**
+* \brief Set the laser ammo that the starship has.
+* \param ammo - int - The ammo that starship will have
+*/
+void StarshipObject::SetLaserAmmo(int ammo)
+{
+    if (laserAmmo >= 0)
+    {
+        laserAmmo = ammo;
+    }
 }
 
 /**

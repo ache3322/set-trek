@@ -75,6 +75,9 @@
     <ClCompile Include="StarshipObject.cpp">
       <Filter>Source Files\GameObj Sources</Filter>
     </ClCompile>
+    <ClCompile Include="TimerClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -115,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="StarshipObject.h">
       <Filter>Header Files\GameObj Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerClass.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

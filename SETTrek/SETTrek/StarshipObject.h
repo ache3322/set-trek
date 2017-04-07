@@ -18,13 +18,14 @@
 //===================
 // CONSTANTS
 //===================
-#define kConstSpeed     2.0f
-#define kDefaultHealth  10000.0f
+#define kConstSpeed         2.0f
+#define kDefaultHealth      10000.0f
+#define kDefaultAmmoLimit   1
 
 
 /**
-* \class MoveableObject
-* \brief The MoveableObject encapsulates the attributes of a moving game object.
+* \class StarshipObject
+* \brief The StarshipObject encapsulates the attributes of a starship object.
 */
 class StarshipObject : public MoveableObject
 {
@@ -36,9 +37,11 @@ private:
     float laserSpeedX;          //!< The laser speed in x-direction
     float laserSpeedY;          //!< The laser speed in y-direction
 
+    int laserAmmo;              //!< How much laser ammo per turn
+
     bool isMoving;              //!< If the object is moving
     bool isDead;                //!< If the object is dead or not
-    bool isFireLaser;            //!< If the object is shooting
+    bool isFireLaser;           //!< If the object is shooting
 
 public:
 
@@ -71,6 +74,7 @@ public:
     float GetLaserY(void);
     float GetLaserSpeedX(void);
     float GetLaserSpeedY(void);
+    int GetLaserAmmo(void);
     bool IsMoving(void);
     bool IsDead(void);
     bool IsLasering(void);
@@ -81,6 +85,7 @@ public:
     void SetLaserY(float y);
     void SetLaserSpeedX(float speedX);
     void SetLaserSpeedY(float speedY);
+    void SetLaserAmmo(int ammo);
     void SetIsMoving(bool moving);
     void SetIsDead(bool dead);
     void SetIsLasering(bool shooting);

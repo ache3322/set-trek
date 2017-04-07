@@ -47,6 +47,7 @@ private:
     GameObject* pPlanet2;			//!< The second planet
     GameObject* pPlanet3;			//!< The third planet
     GameObject* pExplosion;         //!< The explosion bitmap
+    GameObject* pShieldEffect;      //!< The sheidl effect
 
     vector<GameObject *> chosenPlanets;			//!< Contains the planets (a random chance) that will be spawned
     bool reGeneratePlanets;                      //!< A boolean flag to re-generate the planets again and again
@@ -61,4 +62,5 @@ public:
 
     void GenerateRandomPlanet(void);
     void RespawnShips(void);
+    void GenerateNewScene(void);
 };

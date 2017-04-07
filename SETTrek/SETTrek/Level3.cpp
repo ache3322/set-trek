@@ -10,7 +10,6 @@
 
 
 
-
 /**
 * \brief Loading all the game assets for this level.
 * \details The method will load all the assets and setting
@@ -48,10 +47,15 @@ void Level3::Load()
     pGUIMenu = new GameObject();
     pGUIMenu->Init(L".\\assets\\ExplorationGUI.bmp");
 
-
     // Loading the explosion effect
     pExplosion = new GameObject();
     pExplosion->Init(L".\\assets\\Explosion.bmp");
+
+
+    // Loading the shield effect
+    pShieldEffect = new GameObject();
+    pShieldEffect->Init(L".\\assets\\energy_shield.bmp");
+
     //
     //---------------------
 
@@ -86,6 +90,12 @@ void Level3::Load()
     chromaKey = EffectManager::CreateChroma(pExplosion->GetBmp(), 0.8f);
     pExplosion->SetBmp(
         EffectManager::ConvertToBitmap(chromaKey.Get(), pExplosion->GetBmpPixelSize())
+    );
+
+    // Remove background using chroma
+    chromaKey = EffectManager::CreateChroma(pShieldEffect->GetBmp(), 0.5f);
+    pShieldEffect->SetBmp(
+        EffectManager::ConvertToBitmap(chromaKey.Get(), pShieldEffect->GetBmpPixelSize())
     );
 
     //---------------------
@@ -165,6 +175,9 @@ void Level3::Unload(void)
 
     if (pPlayer) delete pPlayer;
     if (pEnemy) delete pEnemy;
+
+    if (pExplosion) delete pExplosion;
+    if (pShieldEffect) delete pShieldEffect;
 }
 
 
@@ -179,22 +192,28 @@ void Level3::Process(int x, int y)
     // Did the player "right click"?
     if (Input::isRightClick)
     {
-        // If so, then we set the mode to laser mode!
-        pPlayer->SetIsLasering(true);
+        // Does the player have enough ammo?
+        if (pPlayer->GetLaserAmmo() == 1)
+        {
+            // If so, then we set the mode to laser mode!
+            pPlayer->SetIsLasering(true);
+            // Decrease the ammo count
+            pPlayer->SetLaserAmmo(pPlayer->GetLaserAmmo() - 1);
 
-        float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
-        float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
+            float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
+            float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
 
-        float deltaX = Input::I_rightMouseX - centerX;
-        float deltaY = Input::I_rightMouseY - centerY;
+            float deltaX = Input::I_rightMouseX - centerX;
+            float deltaY = Input::I_rightMouseY - centerY;
 
-        pPlayer->CalculateLaserSpeed(deltaX, deltaY);
+            pPlayer->CalculateLaserSpeed(deltaX, deltaY);
 
-        // Get the "end" point of the x and y so that the laser
-        // will appear to move from the center of the player ship
-        // to where the right-mouse click is
-        pPlayer->SetLaserX(centerX);
-        pPlayer->SetLaserY(centerY);
+            // Get the "end" point of the x and y so that the laser
+            // will appear to move from the center of the player ship
+            // to where the right-mouse click is
+            pPlayer->SetLaserX(centerX);
+            pPlayer->SetLaserY(centerY);
+        }
     }
 
     // Otherwise, the player is "moving"
@@ -214,6 +233,9 @@ void Level3::Process(int x, int y)
 
         // Calculate the angle
         pPlayer->CalculateAngle(deltaY, deltaX);
+
+        // If the player moves (turn-based), we replenish the ammo
+        pPlayer->SetLaserAmmo(1);
     }
 }
 
@@ -238,8 +260,11 @@ void Level3::Update(void)
     if ((enemyCenterX - enemyBoundaryX < pPlayer->GetCenterX()) && (pPlayer->GetCenterX() < enemyCenterX + enemyBoundaryX)
         && (enemyCenterY - enemyBoundaryY < pPlayer->GetCenterY()) && (pPlayer->GetCenterY() < enemyCenterY + enemyBoundaryY))
     {
-        // Player is taking DAMAGE!
-        pPlayer->SetHealth(pPlayer->GetHealth() - 300);
+        if (!pEnemy->IsDead())
+        {
+            // Player is taking DAMAGE!
+            pPlayer->SetHealth(pPlayer->GetHealth() - 300);
+        }
     }
     else
     {
@@ -278,11 +303,14 @@ void Level3::Update(void)
     //===--------
     // Laser Collision Detection
     //
-    if ((enemyCenterX - (enemyBoundaryX * 0.5f) < pPlayer->GetLaserX()) && (pPlayer->GetLaserX() < enemyCenterX + (enemyBoundaryX * 0.5f))
-        && (enemyCenterY - (enemyBoundaryY * 0.5f) < pPlayer->GetLaserY()) && (pPlayer->GetLaserY() < enemyCenterY + (enemyBoundaryY * 0.5f)))
+    if (pPlayer->IsLasering())
     {
-        // Enemy is taking damage!!!
-        pEnemy->SetHealth(pEnemy->GetHealth() - 1000);
+        if ((enemyCenterX - (enemyBoundaryX * 0.5f) < pPlayer->GetLaserX()) && (pPlayer->GetLaserX() < enemyCenterX + (enemyBoundaryX * 0.5f))
+            && (enemyCenterY - (enemyBoundaryY * 0.5f) < pPlayer->GetLaserY()) && (pPlayer->GetLaserY() < enemyCenterY + (enemyBoundaryY * 0.5f)))
+        {
+            // Enemy is taking damage!!!
+            pEnemy->SetHealth(pEnemy->GetHealth() - 1000);
+        }
     }
     //
     //===--------
@@ -291,7 +319,7 @@ void Level3::Update(void)
     //===--------
     // Enemy Movement
     //
-    if (pPlayer->IsMoving())
+    if (pPlayer->IsMoving() && !pEnemy->IsDead())
     {
         // Calc double the grid width - if enemy approaches within 2 grid spaces of player
         float doubleGridWidth = grid->GetWidth() * 2;
@@ -367,23 +395,19 @@ void Level3::Update(void)
     //===--------
     // Laser Movement
     //
-    if (pPlayer->IsLasering())
+    float laserX = pPlayer->GetLaserX();
+    float laserY = pPlayer->GetLaserY();
+
+    if ( (Input::I_rightMouseX < laserX + 10.0f) && (Input::I_rightMouseX > laserX - 10.0f)
+        && (Input::I_rightMouseY < laserY + 10.0f) && (Input::I_rightMouseY > laserY - 10.0f) )
     {
-        float laserX = pPlayer->GetLaserX();
-        float laserY = pPlayer->GetLaserY();
-
-        if ( (Input::I_rightMouseX < laserX + 10.0f) && (Input::I_rightMouseX > laserX - 10.0f)
-            && (Input::I_rightMouseY < laserY + 10.0f) && (Input::I_rightMouseY > laserY - 10.0f) )
-        {
-            pPlayer->SetIsLasering(false);
-            pPlayer->SetLaserSpeedX(0);
-            pPlayer->SetLaserSpeedY(0);
-        }
-
-        pPlayer->SetLaserX(pPlayer->GetLaserX() + pPlayer->GetLaserSpeedX());
-        pPlayer->SetLaserY(pPlayer->GetLaserY() + pPlayer->GetLaserSpeedY());
-
+        pPlayer->SetIsLasering(false);
+        pPlayer->SetLaserSpeedX(0);
+        pPlayer->SetLaserSpeedY(0);
     }
+
+    pPlayer->SetLaserX(pPlayer->GetLaserX() + pPlayer->GetLaserSpeedX());
+    pPlayer->SetLaserY(pPlayer->GetLaserY() + pPlayer->GetLaserSpeedY());
     //
     //===--------
 
@@ -396,37 +420,21 @@ void Level3::Update(void)
     //  is iterated very fast - the Player ship will 'bounce' back and forth. To
     //  compensate for this - a padding is used to spawn the ship beyond the boundaries.
     //
-    // CHECK the left-side of the screen
-    if (pPlayer->GetX1() < -0.5f - kWindowPadding)
-    {
-        // The player appears on the right-side
-        pPlayer->SetX1(grid->GetWindowWidth() - grid->GetWidth() - kWindowPadding);
-        pPlayer->SetX2(grid->GetWindowWidth() - kWindowPadding);
-        mouseXEnd = pPlayer->GetCenterX();
-        mouseYEnd = pPlayer->GetCenterY();
-        reGeneratePlanets = true;
-
-    }
     // CHECK the right-side of the screen
-    else if (pPlayer->GetX2() > grid->GetWindowWidth())
+    if (pPlayer->GetX2() > grid->GetWindowWidth())
     {
         // The player appears on the left-side
         pPlayer->SetX1(0);
         pPlayer->SetX2(0 + grid->GetWidth());
-        mouseXEnd = pPlayer->GetCenterX();
-        mouseYEnd = pPlayer->GetCenterY();
-        reGeneratePlanets = true;
+        GenerateNewScene();
     }
-
     // CHECK the top-side of the screen
     if (pPlayer->GetY1() < 0.0f)
     {
         // The player appears on the bottom-side
         pPlayer->SetY1(grid->GetWindowHeight() - grid->GetHeight() - kWindowPadding);
         pPlayer->SetY2(grid->GetWindowHeight() - kWindowPadding);
-        mouseXEnd = pPlayer->GetCenterX();
-        mouseYEnd = pPlayer->GetCenterY();
-        reGeneratePlanets = true;
+        GenerateNewScene();
     }
     // CHECK the bottom-side of the screen
     else if (pPlayer->GetY2() > grid->GetWindowHeight())
@@ -434,16 +442,7 @@ void Level3::Update(void)
         // The player appears on the top-side
         pPlayer->SetY1(0 + kWindowPadding);
         pPlayer->SetY2(grid->GetHeight() + kWindowPadding);
-        mouseXEnd = pPlayer->GetCenterX();
-        mouseYEnd = pPlayer->GetCenterY();
-        reGeneratePlanets = true;
-    }
-
-    if (reGeneratePlanets)
-    {
-        grid->GenerateRandCoord();
-        GenerateRandomPlanet();
-        reGeneratePlanets = false;
+        GenerateNewScene();
     }
     //
     //===--------
@@ -455,12 +454,31 @@ void Level3::Update(void)
     OutputDebugStringA(output.c_str());
     if (pPlayer->GetHealth() < 0.0f)
     {
+        if (pPlayer->GetHealth() < 500.0f)
+        {
+            // Prevent the user from moving
+            Input::isLeftClick = false;
+        }
+        // Restart the level
         RespawnShips();
     }
 
     if (pEnemy->GetHealth() < 0.0f)
     {
+        //if (!pEnemy->IsDead())
+        //{
+        //    TimerClass::StartTimer();
+        //}
+
         pEnemy->SetIsDead(true);
+
+        //if (pEnemy->IsDead())
+        //{
+        //    if (TimerClass::GetCurrentElapsedTime() > 500.f)
+        //    {
+        //        RespawnShips();
+        //    }
+        //}
     }
     //
     //===--------
@@ -510,14 +528,34 @@ void Level3::Render(void)
 
     pPlayer->Draw(pPlayer->GetX1(), pPlayer->GetY1(),
         pPlayer->GetX2(), pPlayer->GetY2());
+    
+    // Player ship EXPLODED!!!
+    if (pPlayer->GetHealth() < 500.0f)
+    {
+        pExplosion->Draw(pPlayer->GetX1() - 15, pPlayer->GetY1() - 15,
+            pPlayer->GetX2() + 15, pPlayer->GetY2() + 15);
+    }
+    // Player has SHIELD EFFECT
+    else if (pPlayer->GetHealth() > 5000.0f)
+    {
+        pShieldEffect->Draw(pPlayer->GetX1() - 20, pPlayer->GetY1() - 20,
+            pPlayer->GetX2() + 20, pPlayer->GetY2() + 20, 0.2f);
+    }
 
 
     //==----
     // 4. Draw the Klingon Bird of Pray
     //
-    pEnemy->Draw(pEnemy->GetX1(), pEnemy->GetY1(),
-        pEnemy->GetX2(), pEnemy->GetY2());
-
+    if (!pEnemy->IsDead())
+    {
+        pEnemy->Draw(pEnemy->GetX1(), pEnemy->GetY1(),
+            pEnemy->GetX2(), pEnemy->GetY2());
+    }
+    if (pEnemy->IsDead())
+    {
+        pExplosion->Draw(pEnemy->GetX1() - 15, pEnemy->GetY1() - 15,
+            pEnemy->GetX2() + 15, pEnemy->GetY2() + 15);
+    }
 
 
     //==----
@@ -529,22 +567,6 @@ void Level3::Render(void)
         pGUIMenu->Draw(0, 0, 0.3f);
     }
 
-
-    // DEBUG
-    //==----
-    // 5. Explosion
-    //
-    if (pPlayer->GetHealth() < 500.0f)
-    {
-        pExplosion->Draw(pPlayer->GetX1() - 15, pPlayer->GetY1() - 15,
-            pPlayer->GetX2() + 15, pPlayer->GetY2() + 15);
-    }
-
-    if (pEnemy->IsDead())
-    {
-        pExplosion->Draw(pEnemy->GetX1() - 15, pEnemy->GetY1() - 15,
-            pEnemy->GetX2() + 15, pEnemy->GetY2() + 15);
-    }
 }
 
 /**
@@ -615,6 +637,8 @@ void Level3::RespawnShips(void)
     pPlayer->ResetSpeed();
     // Reset the laser position
     pPlayer->ResetLaser();
+    // Replenish the ammo
+    pPlayer->SetLaserAmmo(1);
 
     mouseXEnd = pPlayer->GetCenterX();
     mouseYEnd = pPlayer->GetCenterY();
@@ -639,4 +663,34 @@ void Level3::RespawnShips(void)
     GenerateRandomPlanet();
 
     Sleep(750);
+}
+
+
+/*
+* \brief Generates a new scene
+* \param None
+* \return None
+*/
+void Level3::GenerateNewScene(void)
+{
+    // Keep track of the mouse position
+    mouseXEnd = pPlayer->GetCenterX();
+    mouseYEnd = pPlayer->GetCenterY();
+
+    // Load a new scene
+    grid->GenerateRandCoord();
+    GenerateRandomPlanet();
+
+    if (pEnemy->IsDead())
+    {
+        // Respawning the enemy ship
+        vector<vector2> v2Grid = grid->GetGrid();
+        pEnemy->SetX1(v2Grid[kEnemySpawn].x);
+        pEnemy->SetX2(v2Grid[kEnemySpawn].x + grid->GetWidth());
+        pEnemy->SetY1(v2Grid[kEnemySpawn].y);
+        pEnemy->SetY2(v2Grid[kEnemySpawn].y + grid->GetHeight());
+        pEnemy->SetAngle(0.0f);
+        pEnemy->SetHealth(5000.0f);
+        pEnemy->SetIsDead(false);
+    }
 }

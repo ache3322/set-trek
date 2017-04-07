@@ -30,6 +30,8 @@ using namespace std;
 // MACRO for the Klingon spawn position
 #define kEnemySpawn         (kNumberOfGrid * ((unsigned int)(kNumberOfGrid * 0.5) - 1) + (kMaximumRow - 1))
 
+#define kMiddleGrid         (kNumberOfGrid * ((unsigned int)(kNumberOfGrid * 0.5) - 1) + (4))
+
 
 //=============================
 // GRAPHIC STRUCT DEFINITIONS

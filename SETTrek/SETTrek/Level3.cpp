@@ -206,7 +206,7 @@ void Level3::Process(int x, int y)
             float deltaX = Input::I_rightMouseX - centerX;
             float deltaY = Input::I_rightMouseY - centerY;
 
-            pPlayer->CalculateLaserSpeed(deltaX, deltaY);
+            pPlayer->CalculateLaserSpeed(deltaX, deltaY, 1.5f);
 
             // Get the "end" point of the x and y so that the laser
             // will appear to move from the center of the player ship
@@ -228,12 +228,14 @@ void Level3::Process(int x, int y)
 
         float deltaX = mouseXEnd - centerX;
         float deltaY = mouseYEnd - centerY;
+
+
         // Calculate the expected speed
         pPlayer->CalculateSpeed(deltaX, deltaY);
 
         // Calculate the angle
         pPlayer->CalculateAngle(deltaY, deltaX);
-
+        
         // If the player moves (turn-based), we replenish the ammo
         pPlayer->SetLaserAmmo(1);
     }
@@ -336,7 +338,7 @@ void Level3::Update(void)
             && (centerY + doubleGridHeight > pEnemy->GetCenterY() && centerY - doubleGridHeight < pEnemy->GetCenterY()))
         {
             // Calculating 15% of the speed for X and Y
-            pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY, 0.10f);
+            pEnemy->CalculateSpeed(enemyDeltaX, enemyDeltaY, 0.15f);
         }
 
         //===--------
@@ -454,31 +456,14 @@ void Level3::Update(void)
     OutputDebugStringA(output.c_str());
     if (pPlayer->GetHealth() < 0.0f)
     {
-        if (pPlayer->GetHealth() < 500.0f)
-        {
-            // Prevent the user from moving
-            Input::isLeftClick = false;
-        }
         // Restart the level
         RespawnShips();
     }
 
     if (pEnemy->GetHealth() < 0.0f)
     {
-        //if (!pEnemy->IsDead())
-        //{
-        //    TimerClass::StartTimer();
-        //}
-
+        // Set the Enemy status to "Dead"
         pEnemy->SetIsDead(true);
-
-        //if (pEnemy->IsDead())
-        //{
-        //    if (TimerClass::GetCurrentElapsedTime() > 500.f)
-        //    {
-        //        RespawnShips();
-        //    }
-        //}
     }
     //
     //===--------
@@ -530,7 +515,7 @@ void Level3::Render(void)
         pPlayer->GetX2(), pPlayer->GetY2());
     
     // Player ship EXPLODED!!!
-    if (pPlayer->GetHealth() < 500.0f)
+    if (pPlayer->GetHealth() < 450.0f)
     {
         pExplosion->Draw(pPlayer->GetX1() - 15, pPlayer->GetY1() - 15,
             pPlayer->GetX2() + 15, pPlayer->GetY2() + 15);
@@ -647,7 +632,6 @@ void Level3::RespawnShips(void)
     pPlayer->SetIsDead(false);
     pPlayer->SetIsLasering(false);
 
-
     // Respawn the Klingon ship
     pEnemy->SetX1(v2Grid[kEnemySpawn].x);
     pEnemy->SetX2(v2Grid[kEnemySpawn].x + grid->GetWidth());
@@ -656,7 +640,6 @@ void Level3::RespawnShips(void)
     pEnemy->SetAngle(0.0f);
     pEnemy->SetHealth(5000.0f);
     pEnemy->SetIsDead(false);
-
 
     // Load a new scene
     grid->GenerateRandCoord();
@@ -685,10 +668,10 @@ void Level3::GenerateNewScene(void)
     {
         // Respawning the enemy ship
         vector<vector2> v2Grid = grid->GetGrid();
-        pEnemy->SetX1(v2Grid[kEnemySpawn].x);
-        pEnemy->SetX2(v2Grid[kEnemySpawn].x + grid->GetWidth());
-        pEnemy->SetY1(v2Grid[kEnemySpawn].y);
-        pEnemy->SetY2(v2Grid[kEnemySpawn].y + grid->GetHeight());
+        pEnemy->SetX1(v2Grid[kMiddleGrid].x);
+        pEnemy->SetX2(v2Grid[kMiddleGrid].x + grid->GetWidth());
+        pEnemy->SetY1(v2Grid[kMiddleGrid].y);
+        pEnemy->SetY2(v2Grid[kMiddleGrid].y + grid->GetHeight());
         pEnemy->SetAngle(0.0f);
         pEnemy->SetHealth(5000.0f);
         pEnemy->SetIsDead(false);

@@ -17,6 +17,7 @@
 #include <string>
 #include "Level.h"
 #include "GameObject.h"
+#include "PlanetObject.h"
 #include "MoveableObject.h"
 #include "StarshipObject.h"
 using namespace std;
@@ -43,13 +44,15 @@ private:
     GameObject* pBackground;		//!< The background sprite
     StarshipObject* pPlayer;		//!< The player starship - the U.S.S Conestoga
     StarshipObject* pEnemy;         //!< The enemy start ship - the Klingon Bird of Prey
-    GameObject* pPlanet1;			//!< The first planet
-    GameObject* pPlanet2;			//!< The second planet
-    GameObject* pPlanet3;			//!< The third planet
+    PlanetObject* pPlanet1;         //!< The first planet
+    PlanetObject* pPlanet2;         //!< The second planet
+    PlanetObject* pPlanet3;         //!< The thrid planet
+
+
     GameObject* pExplosion;         //!< The explosion bitmap
     GameObject* pShieldEffect;      //!< The sheidl effect
 
-    vector<GameObject *> chosenPlanets;			//!< Contains the planets (a random chance) that will be spawned
+    vector<PlanetObject *> chosenPlanets;
     bool reGeneratePlanets;                      //!< A boolean flag to re-generate the planets again and again
 
 public:
@@ -58,9 +61,11 @@ public:
     void Unload(void) override;					// For unloading assets from the game level
     void Update(void) override;					// For updating the game level
     void Render(void) override;					// For rendering the game level
-    void Process(int x, int y) override;		// For processing input from the user and applying to game level
+    void Process(void) override;		// For processing input from the user and applying to game level
 
     void GenerateRandomPlanet(void);
     void RespawnShips(void);
     void GenerateNewScene(void);
+    void RenderShipInfo(void);
+    void RenderPlanetInfo(PlanetObject* planet);
 };

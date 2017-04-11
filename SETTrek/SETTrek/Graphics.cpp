@@ -15,12 +15,17 @@
 */
 Graphics::Graphics()
 {
-	brush = NULL;
+	brush = nullptr;
 
-	d2d1Factory1 = NULL;
-	d2d1Context = NULL;
-	d2d1Device = NULL;
-	d2d1Bitmap = NULL;
+	d2d1Factory1 = nullptr;
+	d2d1Context = nullptr;
+	d2d1Device = nullptr;
+	d2d1Bitmap = nullptr;
+
+    // DirectWrite variables
+    dwriteFactory = nullptr;
+    dwriteTextFormat = nullptr;
+    dwriteTextLayout = nullptr;
 
 	parameters.DirtyRectsCount = 0;
 	parameters.pDirtyRects = nullptr;
@@ -52,6 +57,11 @@ Graphics::~Graphics()
 	if (d2d1Device) d2d1Device->Release();
 	if (dxgiSwapChain) dxgiSwapChain->Release();
 	if (d2d1Bitmap) d2d1Bitmap->Release();
+
+    // Cleaning up DirectWrite resources
+    if (dwriteFactory) dwriteFactory->Release();
+    if (dwriteTextFormat) dwriteTextFormat->Release();
+    if (dwriteTextLayout) dwriteTextLayout->Release();
 
     CoUninitialize();
 }
@@ -233,9 +243,52 @@ bool Graphics::Init(HWND windowHandle)
 
     //=====================
     //-------------------
+    //--- INIT DIRECTWRITE
+    if (!InitDirectWrite()) return false;
+
+
+    //=====================
+    //-------------------
     //--- INIT DIRECTX11
 
 	return true;
+}
+
+
+/**
+* \brief Create the DirectWrite objects.
+* \param None
+* \return None
+*/
+bool Graphics::InitDirectWrite(void)
+{
+    static const WCHAR msc_fontName[] = L"Agency FB";
+    static const FLOAT msc_fontSize = 50;
+
+    HRESULT hr;
+
+    // Create the DirectWrite factory
+    hr = DWriteCreateFactory(
+        DWRITE_FACTORY_TYPE_ISOLATED,
+        __uuidof(dwriteFactory),
+        reinterpret_cast<IUnknown **>(&dwriteFactory)
+    );
+    if (hr != S_OK) return false;
+
+    // Create the text-font format
+    hr = dwriteFactory->CreateTextFormat(
+        msc_fontName,
+        NULL,
+        DWRITE_FONT_WEIGHT_NORMAL,
+        DWRITE_FONT_STYLE_NORMAL,
+        DWRITE_FONT_STRETCH_NORMAL,
+        msc_fontSize,
+        L"",
+        &dwriteTextFormat
+    );
+    if (hr != S_OK) return false;
+       
+    return true;
 }
 
 
@@ -323,6 +376,28 @@ void Graphics::EndDraw(void)
 
 
 /**
+* \brief Renders text to the screen.
+* \param text - wstring - The text to render
+* \param renderSize - D2D1_RECT_F - The area to render the text
+* \return void
+*/
+void Graphics::RenderText(wstring text, D2D1_RECT_F renderSize, D2D1_COLOR_F fontColor)
+{
+    UINT32 length = (UINT32)text.length();
+
+    brush->SetColor(fontColor);
+
+    d2d1Context->DrawTextA(
+        text.c_str(),
+        text.length(),
+        dwriteTextFormat,
+        renderSize,
+        brush
+    );
+}
+
+
+/**
 * \brief Get the device context target.
 * \details The DeviceContext expands upon the RenderTarget. It provides
 *	the same methods, but even more. You can use the DeviceContext for effects.
@@ -331,6 +406,16 @@ void Graphics::EndDraw(void)
 ID2D1DeviceContext* Graphics::GetDeviceContext(void)
 {
 	return d2d1Context;
+}
+
+
+/**
+* \brief Get the DirectWrite text format
+* \return IDWriteTextFormat* - A reference to the directwrite text format.
+*/
+IDWriteTextFormat* Graphics::GetTextFormat(void)
+{
+    return dwriteTextFormat;
 }
 
 

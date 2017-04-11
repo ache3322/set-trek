@@ -27,9 +27,9 @@ void Level3::Load()
 
     // Loading the assets, resources, images, etc.
     pBackground = new GameObject();
-    pPlanet1 = new GameObject();
-    pPlanet2 = new GameObject();
-    pPlanet3 = new GameObject();
+    pPlanet1 = new PlanetObject();
+    pPlanet2 = new PlanetObject();
+    pPlanet3 = new PlanetObject();
     unique_ptr<GameObject> starShipBase(new GameObject());
     unique_ptr<GameObject> starShipDetail(new GameObject());
     pEnemy = new StarshipObject(0.0f, 0.0f, 3.5f, 5000.0f);
@@ -45,12 +45,11 @@ void Level3::Load()
     //---------------------
     // Loading Exploration GUI (WIP)
     pGUIMenu = new GameObject();
-    pGUIMenu->Init(L".\\assets\\ExplorationGUI.bmp");
+    pGUIMenu->Init(L".\\assets\\planet_scan.bmp");
 
     // Loading the explosion effect
     pExplosion = new GameObject();
     pExplosion->Init(L".\\assets\\Explosion.bmp");
-
 
     // Loading the shield effect
     pShieldEffect = new GameObject();
@@ -184,21 +183,19 @@ void Level3::Unload(void)
 /**
 * \brief Process the player's input.
 * \details The input can be as simple as a mouse click event.
-* \param x - int - The mouse X position
-* \param y - int - The mouse Y position
 */
-void Level3::Process(int x, int y)
+void Level3::Process(void)
 {
     // Did the player "right click"?
     if (Input::isRightClick)
     {
         // Does the player have enough ammo?
-        if (pPlayer->GetLaserAmmo() == 1)
+        if (pPlayer->GetLaserAmmo() >= 100)
         {
             // If so, then we set the mode to laser mode!
             pPlayer->SetIsLasering(true);
             // Decrease the ammo count
-            pPlayer->SetLaserAmmo(pPlayer->GetLaserAmmo() - 1);
+            pPlayer->SetLaserAmmo(pPlayer->GetLaserAmmo() - 100);
 
             float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
             float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
@@ -213,15 +210,17 @@ void Level3::Process(int x, int y)
             // to where the right-mouse click is
             pPlayer->SetLaserX(centerX);
             pPlayer->SetLaserY(centerY);
+
         }
+        Input::isRightClick = false;
     }
 
     // Otherwise, the player is "moving"
     if (Input::isLeftClick)
     {
         // Get the current mouse click position
-        mouseXEnd = (float)x;
-        mouseYEnd = (float)y;
+        mouseXEnd = (float)Input::I_leftMouseX;
+        mouseYEnd = (float)Input::I_leftMouseY;
 
         float centerX = (pPlayer->GetX1() + pPlayer->GetX2()) / 2;
         float centerY = (pPlayer->GetY1() + pPlayer->GetY2()) / 2;
@@ -236,8 +235,44 @@ void Level3::Process(int x, int y)
         // Calculate the angle
         pPlayer->CalculateAngle(deltaY, deltaX);
         
-        // If the player moves (turn-based), we replenish the ammo
-        pPlayer->SetLaserAmmo(1);
+        Input::isLeftClick = false;
+    }
+
+
+    if (Level::mode == explorationMode)
+    {
+        for(PlanetObject* p : chosenPlanets)
+        {
+            if (p->GetIsCurrent())
+            {
+                switch (Input::I_keyValue)
+                {
+                case KEY_1:
+                    if (p->GetEnergyResource() > 0)
+                    {
+                        pPlayer->SetHealth(pPlayer->GetHealth() + p->GetEnergyResource());
+                        p->SetEnergyResource(0);
+                    }
+                    break;
+
+                case KEY_2:
+                    if (p->GetScienceResource() > 0)
+                    {
+                        pPlayer->SetLaserAmmo(pPlayer->GetLaserAmmo() + p->GetScienceResource());
+                        p->SetScienceResource(0);
+                    }
+                    break;
+
+                case KEY_3:
+                    Input::I_keyValue = 0x00;
+                    p->SetIsCurrent(false);
+                    Level::mode = spaceMode;
+                    break;
+                }
+            }
+        }
+
+        Input::isKeyDown = false;
     }
 }
 
@@ -249,10 +284,16 @@ void Level3::Process(int x, int y)
 */
 void Level3::Update(void)
 {
+    if (Level::mode == explorationMode)
+    {
+        return;
+    }
+
     float centerX = pPlayer->GetCenterX();
     float centerY = pPlayer->GetCenterY();
     float enemyCenterX = pEnemy->GetCenterX();
     float enemyCenterY = pEnemy->GetCenterY();
+
 
     //===--------
     // Enemy Collision Detection
@@ -265,7 +306,7 @@ void Level3::Update(void)
         if (!pEnemy->IsDead())
         {
             // Player is taking DAMAGE!
-            pPlayer->SetHealth(pPlayer->GetHealth() - 300);
+            pPlayer->SetHealth(pPlayer->GetHealth() - 100);
         }
     }
     else
@@ -291,12 +332,23 @@ void Level3::Update(void)
         if ((pPlayer->GetCenterX() < planetCenterX + halfGridWidth && pPlayer->GetCenterX() > planetCenterX - halfGridWidth)
             && (pPlayer->GetCenterY() < planetCenterY + halfGridHeight && pPlayer->GetCenterY() > planetCenterY - halfGridHeight))
         {
-            pPlayer->SetIsColliding(true);
+            // Only goto exploration mode if and only if
+            // they have not visited the planet
+            if (chosenPlanets[i]->GetIsVisited() == false)
+            {
+                pPlayer->SetIsColliding(true);
+                chosenPlanets[i]->SetIsVisited(true);
+                chosenPlanets[i]->SetIsCurrent(true);
+
+                // Change the mode type to exploration mode
+                Level::mode = explorationMode;
+            }
             break;
         }
         else
         {
             pPlayer->SetIsColliding(false);
+            //chosenPlanets[i]->SetIsVisited(false);
         }
     }
     //
@@ -452,8 +504,6 @@ void Level3::Update(void)
     //===--------
     // Process Player Health
     //
-    string output = "Player health ( " + to_string(pPlayer->GetHealth()) + " )\n";
-    OutputDebugStringA(output.c_str());
     if (pPlayer->GetHealth() < 0.0f)
     {
         // Restart the level
@@ -477,6 +527,23 @@ void Level3::Update(void)
 */
 void Level3::Render(void)
 {
+    if (Level::mode == explorationMode)
+    {
+        //1. Draw the Background before other objects
+        pGUIMenu->Draw(0, 0, windowWidth, windowHeight);
+
+        for (int i = 0; i < grid->GetRandCoordSize(); ++i)
+        {
+            if (chosenPlanets[i]->GetIsVisited() && chosenPlanets[i]->GetIsCurrent())
+            {
+                RenderPlanetInfo(chosenPlanets[i]);
+            }
+        }
+
+        return;
+    }
+
+
     float gridWidth = grid->GetWidth();
     float gridHeight = grid->GetHeight();
 
@@ -496,7 +563,7 @@ void Level3::Render(void)
     }
 
     //==----
-    // 5. Draw the Player's laser
+    // Draw the Player's laser
     //
     if (pPlayer->IsLasering())
     {
@@ -542,16 +609,8 @@ void Level3::Render(void)
             pEnemy->GetX2() + 15, pEnemy->GetY2() + 15);
     }
 
-
-    //==----
-    // 5. Draw the Exploration GUI
-    //
-    // Only draw the UI if a Player is colliding with a Planet
-    if (pPlayer->IsColliding())
-    {
-        pGUIMenu->Draw(0, 0, 0.3f);
-    }
-
+    // Render the text and any other information
+    RenderShipInfo();
 }
 
 /**
@@ -562,7 +621,7 @@ void Level3::Render(void)
 void Level3::GenerateRandomPlanet(void)
 {
     int randomChance = 0;
-    GameObject* tmpPlanet = nullptr;
+    PlanetObject* tmpPlanet = nullptr;
 
     chosenPlanets.clear();
 
@@ -578,18 +637,21 @@ void Level3::GenerateRandomPlanet(void)
 
         randomChance = rand() % 3;
         if (randomChance == 0) {
-            tmpPlanet = new GameObject();
+            tmpPlanet = new PlanetObject();
             tmpPlanet->SetBmp(pPlanet1->GetBmp());
+            tmpPlanet->GenerateRandomResources();
             chosenPlanets.push_back(tmpPlanet);
         }
         else if (randomChance == 1) {
-            tmpPlanet = new GameObject();
+            tmpPlanet = new PlanetObject();
             tmpPlanet->SetBmp(pPlanet2->GetBmp());
+            tmpPlanet->GenerateRandomResources();
             chosenPlanets.push_back(tmpPlanet);
         }
         else if (randomChance == 2) {
-            tmpPlanet = new GameObject();
+            tmpPlanet = new PlanetObject();
             tmpPlanet->SetBmp(pPlanet3->GetBmp());
+            tmpPlanet->GenerateRandomResources();
             chosenPlanets.push_back(tmpPlanet);
         }
 
@@ -623,7 +685,7 @@ void Level3::RespawnShips(void)
     // Reset the laser position
     pPlayer->ResetLaser();
     // Replenish the ammo
-    pPlayer->SetLaserAmmo(1);
+    pPlayer->SetLaserAmmo(kDefaultAmmoLimit);
 
     mouseXEnd = pPlayer->GetCenterX();
     mouseYEnd = pPlayer->GetCenterY();
@@ -676,4 +738,68 @@ void Level3::GenerateNewScene(void)
         pEnemy->SetHealth(5000.0f);
         pEnemy->SetIsDead(false);
     }
+}
+
+
+/**
+* \brief Renders ship text information.
+* \details Renders the ship information on the screen. The ship information
+*   includes the amount of energy and the ammo count.
+*/
+void Level3::RenderShipInfo(void)
+{
+    const int ammoCount = pPlayer->GetLaserAmmo();
+    const float energy = pPlayer->GetHealth();
+
+    wstringstream format;
+    format << fixed << setprecision(0) << energy;
+
+    // Creating the energy text
+    wstring info = L"Energy: " + format.str() + L"\n";
+    // Creating the Ammo count
+    info += L"Power: " + to_wstring(ammoCount);
+
+    // Center the text horizontally and vertically
+    gfx->GetTextFormat()->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+    gfx->GetTextFormat()->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
+    gfx->RenderText(info, screenSize, D2D1::ColorF(255, 255, 255));
+}
+
+
+
+void Level3::RenderPlanetInfo(PlanetObject* planet)
+{
+    const int scienceAmount = planet->GetScienceResource();
+    const int energyAmount = planet->GetEnergyResource();
+
+    // Creating the energy text
+    wstring info = L"Energy: " + to_wstring(energyAmount) + L"\n";
+    // Creating the Ammo count
+    info += L"Science: " + to_wstring(scienceAmount);
+
+    // Center the text horizontally and vertically
+    gfx->GetTextFormat()->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+    gfx->GetTextFormat()->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+    gfx->RenderText(info, screenSize, D2D1::ColorF(255, 106, 0));
+
+
+    //==---- MENU OPTIONS
+    wstring options = L"\n\n";
+    options += L"1. Replenish Energy\n";
+    options += L"2. Gather Energy\n";
+    options += L"3. Leave Orbit";
+
+    // Center the text horizontally and vertically
+    gfx->GetTextFormat()->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+    gfx->GetTextFormat()->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+    // The x-position of the text starts 40% of the screen width
+    float textPosX = screenSize.right * 0.35f;
+    // The y-position of the text starts at the center, offset by 20% of the screen height
+    float textPosY = screenSize.right * 0.2f;
+
+    D2D1_RECT_F drawArea = D2D1::RectF(textPosX, textPosY, screenSize.right, screenSize.bottom);
+    gfx->RenderText(options, drawArea, D2D1::ColorF(255, 255, 255));
 }

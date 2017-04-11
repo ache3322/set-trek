@@ -14,7 +14,7 @@
 Graphics* Level::gfx;
 D2D1_RECT_F Level::screenSize;
 Grid* Level::grid;
-
+Level::GameMode Level::mode = spaceMode;
 
 
 /**

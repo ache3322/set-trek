@@ -23,9 +23,17 @@
 class Level
 {
 protected:
+
+    enum GameMode
+    {
+        spaceMode = 0,
+        explorationMode = 1
+    };
+
 	static Graphics* gfx;		    //!< Reference to the Graphics object
     static D2D1_RECT_F screenSize;	//!< The rectangle area/size of where the object will be drawn 
     static Grid* grid;              //!< The grid for the level
+    static GameMode mode;
 
 public:
 
@@ -36,5 +44,5 @@ public:
 	virtual void Unload(void) = 0;				// For unloading assets from the game level
 	virtual void Update(void) = 0;				// For updating the game level
 	virtual void Render(void) = 0;				// For rendering the game level
-	virtual void Process(int x, int y) = 0;		// For processing input
+	virtual void Process(void) = 0;		// For processing input
 };

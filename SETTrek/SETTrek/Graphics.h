@@ -10,7 +10,9 @@
 #pragma once
 #include <Windows.h>
 #include <cmath>
-
+#include <string>
+#include <sstream>
+#include <iomanip>
 // Newly Direct2D for Windows 8.1 and later
 #include <wrl.h>
 #include <wrl/client.h>
@@ -19,9 +21,10 @@
 #include <d3d11_1.h>
 #include <d2d1effects_2.h>
 #include <d2d1effecthelpers.h>
-// From Rasterek tutorial
+#include <dwrite.h>
 #include <DirectXMath.h>
 
+using namespace std;
 using namespace DirectX;
 using namespace Microsoft::WRL;	// For using ComPtr
 
@@ -72,6 +75,13 @@ private:
 	ID2D1Device* d2d1Device;				//!< Direct2D device 
 	ID2D1Bitmap1* d2d1Bitmap;				//!< Direct 2D bitmap used as the render target for device context
 
+    //===-----------------
+    // DirectWrite fonts, writing
+    IDWriteFactory* dwriteFactory;
+    IDWriteTextFormat* dwriteTextFormat;
+    IDWriteTextLayout* dwriteTextLayout;
+
+
 	DXGI_PRESENT_PARAMETERS parameters;		//!< DXGI parameters settings for swap chaining
 
     //===-----------------
@@ -107,11 +117,15 @@ public:
 	/*-General Methods-*/
 	//------------------
 	bool Init(HWND windowHandle);
+    bool InitDirectWrite(void);
 	void Resize(HWND windowHandle);
 
 	void BeginDraw(void) { d2d1Context->BeginDraw(); }
 	void EndDraw(void);
+    void RenderText(wstring text, D2D1_RECT_F area, D2D1_COLOR_F fontColor);
+
 	ID2D1DeviceContext* GetDeviceContext(void);
+    IDWriteTextFormat* GetTextFormat(void);
 
 	void ClearScreen(float r, float g, float b);
 	void DrawCircle(float c, float y, float radius, float r, float g, float b, float a = 1.0f);

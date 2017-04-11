@@ -13,9 +13,10 @@ float Input::I_leftMouseX;
 float Input::I_leftMouseY;
 float Input::I_rightMouseX;
 float Input::I_rightMouseY;
+unsigned int Input::I_keyValue;
 volatile bool Input::isLeftClick;
 volatile bool Input::isRightClick;
-
+volatile bool Input::isKeyDown;
 
 
 /**
@@ -29,8 +30,10 @@ void Input::InitInput(void)
     I_leftMouseY = 0.f;
     I_rightMouseX = 0.f;
     I_rightMouseY = 0.f;
+    I_keyValue = 0x00;
 
     // Boolean for left and right click events
     isLeftClick = false;
     isRightClick = false;
+    isKeyDown = false;
 }

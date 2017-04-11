@@ -8,6 +8,7 @@
 #include <Windows.h>
 #include <Windowsx.h>
 #include <timeapi.h>
+#include <random>
 #include "Graphics.h"
 #include "Input.h"
 #include "GameManager.h"
@@ -63,6 +64,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         Input::I_rightMouseX = (float)GET_X_LPARAM(lParam);
         Input::I_rightMouseY = (float)GET_Y_LPARAM(lParam);
         Input::isRightClick = true;
+        break;
+
+    case WM_KEYDOWN:
+        Input::I_keyValue = wParam;
+        Input::isKeyDown = true;
         break;
     }
 
@@ -172,6 +178,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 	// Now show/display the window
 	ShowWindow(windowHandle, nCmdShow);
 
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<int> dist(100, 500);
+
+    for (int i = 0; i < 16; ++i)
+    {
+        double num = dist(mt);
+        string debug = to_string(num) + "\n";
+        OutputDebugString(debug.c_str());
+    }
+
     
     //===------------
     //
@@ -188,12 +205,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmd, int
 		else
 		{
 			// Process input
-            if (Input::isLeftClick || Input::isRightClick) 
-            {
-                GameManager::Process(Input::I_leftMouseX, Input::I_leftMouseY);
-                Input::isLeftClick = false;
-                Input::isRightClick = false;
-            }
+            GameManager::Process();
             
 			// Update the game - any values, assets, coordinates, sizes
 			GameManager::Update();

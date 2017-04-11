@@ -20,7 +20,8 @@
 //===================
 #define kConstSpeed         2.0f
 #define kDefaultHealth      10000.0f
-#define kDefaultAmmoLimit   1
+#define kDefaultShield      5000.0f
+#define kDefaultAmmoLimit   100
 
 
 /**
@@ -32,6 +33,7 @@ class StarshipObject : public MoveableObject
 private:
 
     float health;               //!< The health of the object
+    float shield;
     float laserX;               //!< The position of the laser (x-direction)
     float laserY;               //!< The position of the laser (y-direction)
     float laserSpeedX;          //!< The laser speed in x-direction
@@ -70,6 +72,7 @@ public:
 
     //-Accessors
     float GetHealth(void);
+    float GetShield(void);
     float GetLaserX(void);
     float GetLaserY(void);
     float GetLaserSpeedX(void);
@@ -81,6 +84,7 @@ public:
 
     //-Mutators
     void SetHealth(float h);
+    void SetShield(float s);
     void SetLaserX(float x);
     void SetLaserY(float y);
     void SetLaserSpeedX(float speedX);

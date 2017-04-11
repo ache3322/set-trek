@@ -10,6 +10,14 @@
 
 
 
+//=============================
+// INPUT CONSTANTS
+//=============================
+#define KEY_0       0x30
+#define KEY_1       0x31
+#define KEY_2       0x32
+#define KEY_3       0x33
+
 
 /**
 * \class Input
@@ -26,9 +34,12 @@ public:
     static float I_leftMouseY;
     static float I_rightMouseX;
     static float I_rightMouseY;
+    static unsigned int I_keyValue;
 
     static volatile bool isLeftClick;
     static volatile bool isRightClick;
+
+    static volatile bool isKeyDown;
 
     static void InitInput(void);
 };

@@ -20,6 +20,7 @@
 StarshipObject::StarshipObject()
 {
     health = kDefaultHealth;
+    shield = kDefaultShield;
     laserX = 0.0f;
     laserY = 0.0f;
     laserSpeedX = 0.0f;
@@ -44,6 +45,7 @@ StarshipObject::StarshipObject(float x, float y)
     : MoveableObject(x, y)
 {
     health = kDefaultHealth;
+    shield = kDefaultShield;
     laserX = 0.0f;
     laserY = 0.0f;
     laserSpeedX = 0.0f;
@@ -69,6 +71,7 @@ StarshipObject::StarshipObject(float xSpeed, float ySpeed, float baseSpeed)
     : MoveableObject(xSpeed, ySpeed, baseSpeed)
 {
     health = kDefaultHealth;
+    shield = kDefaultShield;
     laserX = 0.0f;
     laserY = 0.0f;
     laserSpeedX = 0.0f;
@@ -95,6 +98,7 @@ StarshipObject::StarshipObject(float xSpeed, float ySpeed, float baseSpeed, floa
     : MoveableObject(xSpeed, ySpeed, baseSpeed)
 {
     this->health = health;
+    shield = kDefaultShield;
     laserX = 0.0f;
     laserY = 0.0f;
     laserSpeedX = 0.0f;
@@ -271,6 +275,15 @@ float StarshipObject::GetHealth(void)
 }
 
 /**
+* \brief Get the shield
+* \return float : shield of the object.
+*/
+float StarshipObject::GetShield(void)
+{
+    return shield;
+}
+
+/**
 * \brief Get the x-position of the laser
 * \return float : laser x position.
 */
@@ -354,6 +367,15 @@ bool StarshipObject::IsLasering(void)
 void StarshipObject::SetHealth(float h)
 {
     health = h;
+}
+
+/**
+* \brief Sets the shield of the object.
+* \param h - float - The shield
+*/
+void StarshipObject::SetShield(float s)
+{
+    shield = s;
 }
 
 /**
